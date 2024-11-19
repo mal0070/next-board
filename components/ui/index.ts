@@ -4,3 +4,4 @@ export { SearchBar } from './search-bar';
 export { Progress } from './progress';
 export { Popover, PopoverTrigger, PopoverContent, PopoverAnchor } from './popover';
 export { Calendar } from './calendar';
+export {DatePicker} from './date-picker';

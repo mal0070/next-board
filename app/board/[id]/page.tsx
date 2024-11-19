@@ -1,26 +1,17 @@
 'use client';
 
 import * as React from 'react';
-import { format } from 'date-fns';
-import { CalendarIcon } from 'lucide-react';
-
-import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import {
   Button,
   SearchBar,
   Progress,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-  Calendar,
+  DatePicker,
 } from '@/components/ui';
 import styles from './page.module.scss';
 
 function BoardPage() {
   const router = useRouter();
-
-  const [date, setDate] = React.useState<Date>();
 
   return (
     <div className="page">
@@ -62,29 +53,10 @@ function BoardPage() {
             </div>
           </div>
           <div className={styles.header__bottom}>
-            <div className="flex items-center">
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant={'outline'}
-                    className={cn(
-                      'w-[280px] justify-start text-left font-normal',
-                      !date && 'text-muted-foreground'
-                    )}
-                  >
-                    <CalendarIcon />
-                    {date ? format(date, 'PPP') : <span>Pick a date</span>}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={date}
-                    onSelect={setDate}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
+            <div className="flex items-center gap-3">
+              <DatePicker label='From'/>
+              <DatePicker label='To'/>
+              <Button>View Timeline</Button>
             </div>
             <Button className='bg-[#ea8628] border border-[#E79057] hover:bg-[#ffb235]'>Add New Board</Button>
           </div>
