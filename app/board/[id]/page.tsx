@@ -2,16 +2,19 @@
 
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import {
-  Button,
-  SearchBar,
-  Progress,
-  DatePicker,
-} from '@/components/ui';
+import { Button, SearchBar, Progress, DatePicker } from '@/components/ui';
 import styles from './page.module.scss';
+import BoardItem from './board-item';
 
 function BoardPage() {
   const router = useRouter();
+
+  const [item, setItem] = React.useState([]);
+
+  const handleClick = () => {
+    console.log('포스트 추가');
+   // setItem()
+  };
 
   return (
     <div className="page">
@@ -54,14 +57,18 @@ function BoardPage() {
           </div>
           <div className={styles.header__bottom}>
             <div className="flex items-center gap-3">
-              <DatePicker label='From'/>
-              <DatePicker label='To'/>
+              <DatePicker label="From" />
+              <DatePicker label="To" />
               <Button>View Timeline</Button>
             </div>
-            <Button className='bg-[#ea8628] border border-[#E79057] hover:bg-[#ffb235]'>Add New Board</Button>
+            <Button className="bg-[#ea8628] border border-[#E79057] hover:bg-[#ffb235]" onClick={handleClick}>
+              Add New Board
+            </Button>
           </div>
         </div>
-        <div className={styles.body}></div>
+        <div className={styles.area}>
+          <BoardItem/>
+        </div>
       </main>
     </div>
   );

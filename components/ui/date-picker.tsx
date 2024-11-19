@@ -34,7 +34,7 @@ function DatePicker({ label }: Props) {
             )}
           >
             <CalendarIcon />
-            {date ? format(date, 'PPP') : <span>Pick a date</span>}
+            {date ? format(date, 'PPP') : <span>날짜를 선택해주세요.</span>}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0">
