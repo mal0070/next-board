@@ -4,7 +4,7 @@ import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import { Button, SearchBar, Progress, DatePicker } from '@/components/ui';
 import styles from './page.module.scss';
-import BoardItem from './board-item';
+import BoardItem from '../../../features/board/board-item';
 
 function BoardPage() {
   const router = useRouter();
@@ -59,7 +59,7 @@ function BoardPage() {
             <div className="flex items-center gap-3">
               <DatePicker label="From" />
               <DatePicker label="To" />
-              <Button>View Timeline</Button>
+              <Button className='bg-gray-200 text-gray-500'>View Timeline</Button>
             </div>
             <Button className="bg-[#ea8628] border border-[#E79057] hover:bg-[#ffb235]" onClick={handleClick}>
               Add New Board

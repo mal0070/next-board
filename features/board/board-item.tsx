@@ -21,8 +21,8 @@ function BoardItem() {
             <DatePicker label="To" />
           </div>
           <div className="flex gap-3">
-            <Button>Duplicate</Button>
-            <Button>Delete</Button>
+            <Button className='bg-transparent text-gray-500'>Duplicate</Button>
+            <Button className='bg-transparent text-gray-500'>Delete</Button>
           </div>
         </div>
       </div>
