@@ -28,7 +28,7 @@ function BoardItem() {
       </div>
       <div className='flex flex-col items-center gap-5'>
         <hr className="w-full solid"></hr>
-        <button type="submit">Add Contents</button>
+        <Button  variant={"ghost"} className="text-gray-500 bg-transparent">Add Contents</Button>
       </div>
     </div>
   );
