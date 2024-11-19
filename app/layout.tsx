@@ -1,8 +1,15 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import "./globals.css";
+import "./styles/globals.css";
+import { Noto_Sans_KR} from 'next/font/google';
+import './styles/main.scss';
 
-const geistSans = localFont({
+const noto = Noto_Sans_KR({
+  subsets: ['latin'],
+  display: "swap",
+})
+
+/*const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
   weight: "100 900",
@@ -11,7 +18,7 @@ const geistMono = localFont({
   src: "./fonts/GeistMonoVF.woff",
   variable: "--font-geist-mono",
   weight: "100 900",
-});
+});*/
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -24,10 +31,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+    <html lang="ko">
+      <body className={noto.className} >
         {children}
       </body>
     </html>
