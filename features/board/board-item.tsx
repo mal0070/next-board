@@ -1,13 +1,19 @@
 import { DatePicker, Button } from '@/components/ui';
 import React from 'react';
+import { MarkdownEditorDialog } from './ME-dialog';
 
 function BoardItem() {
   return (
     <div className="flex flex-col gap-3 h-[180px] bg-[#ffffff] rounded-sm p-5">
       <div className="flex flex-col gap-3">
         {/** board-item-header */}
-        <div className='items-center'>
-          <input type="checkbox" id="todo" name="todo" className='w-[20px] h-[20px]' />
+        <div className="items-center">
+          <input
+            type="checkbox"
+            id="todo"
+            name="todo"
+            className="w-[20px] h-[20px]"
+          />
           <label
             htmlFor="todo"
             className="scroll-m-20 text-2xl font-semibold tracking-tight m-3"
@@ -21,14 +27,18 @@ function BoardItem() {
             <DatePicker label="To" />
           </div>
           <div className="flex gap-3">
-            <Button className='bg-transparent text-gray-500'>Duplicate</Button>
-            <Button className='bg-transparent text-gray-500'>Delete</Button>
+            <Button className="bg-transparent text-gray-500">Duplicate</Button>
+            <Button className="bg-transparent text-gray-500">Delete</Button>
           </div>
         </div>
       </div>
-      <div className='flex flex-col items-center gap-5'>
+      <div className="flex flex-col items-center gap-5">
         <hr className="w-full solid"></hr>
-        <Button  variant={"ghost"} className="text-gray-500 bg-transparent">Add Contents</Button>
+        <MarkdownEditorDialog>
+          <Button variant={'ghost'} className="text-gray-500 bg-transparent">
+            Add Contents
+          </Button>
+        </MarkdownEditorDialog>
       </div>
     </div>
   );

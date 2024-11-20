@@ -68,6 +68,7 @@ function BoardPage() {
         </div>
         <div className={styles.area}>
           <BoardItem/>
+          <BoardItem/>
         </div>
       </main>
     </div>
