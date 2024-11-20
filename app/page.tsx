@@ -30,8 +30,6 @@ function Home() {
         })
         .select();
 
-      //if (error) throw error;
-
       if (data) {
         router.push(`/board/${data[0].id}`);
         console.log(data);
@@ -73,6 +71,7 @@ function Home() {
                 <li
                   key={todo.id}
                   className="flex items-center gap-2 py-2 px-[10px] ml-0"
+                  onClick={()=> router.push(`/board/${todo.id}`)}
                 >
                   <div className="h-[10px] w-[10px] bg-[#00f38d]"></div>
                   <p>{todo.title}</p>

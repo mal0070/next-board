@@ -49,6 +49,10 @@ function BoardPage() {
   
   };
 
+  const backHome = () => {
+    router.push('/');
+  }
+
   return (
     <div className="page">
       <aside className="page__aside">
@@ -77,7 +81,7 @@ function BoardPage() {
         <div className={styles.header}>
           <div className={styles.header__top}>
             <div className="flex gap-2">
-              <Button className="w-5 h-10 bg-slate-300">
+              <Button className="w-5 h-10 bg-slate-300" onClick={backHome}>
                 <ArrowLeftSquareIcon />
               </Button>
               <Button className="w-12 h-10 ">저장</Button>
