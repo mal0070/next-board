@@ -25,15 +25,41 @@ function BoardPage() {
   const tid = params.id;
 
   const [items, setItems] = React.useState<BoardData[]>([]);
+  const [todoTitle, setTodoTitle] = React.useState<string>('');
 
   React.useEffect(() => {
     getBoards();
-  }, []);
+    getTodoTitle();
+  }, [tid]);
 
   async function getBoards() {
     const { data } = await supabase.from('boards').select().eq('todo_id', tid);
     setItems(data || []);
   }
+
+  async function getTodoTitle() {
+    const { data } = await supabase.from('todos').select().eq('id', tid).single();
+    setTodoTitle(data?.title || '');
+  }
+
+  const handleTodoTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTodoTitle(e.target.value);
+  };
+
+  const saveTodoTitle = async () => {
+    try {
+      const { error } = await supabase
+        .from('todos')
+        .update({ title: todoTitle })
+        .eq('id', tid);
+
+      if (error) throw error;
+
+      console.log('Todo title updated successfully');
+    } catch (error) {
+      console.error('Error updating todo title:', error);
+    }
+  };
 
   const addBoard = async () => {
     try {
@@ -47,6 +73,11 @@ function BoardPage() {
           is_checked: false,
           todo_id: tid
         }).select();
+
+        if(data) {
+          console.log(data);
+          getBoards();
+        }
 
     } catch (error) {
       console.error('board insert 오류: ' + error);
@@ -64,7 +95,7 @@ function BoardPage() {
         <SearchBar placeholder="검색어를 입력하세요"></SearchBar>
         <Button
           className="text-[#E79057] bg-white border border-[#E79057] hover:bg-[#ffb235]"
-          onClick={() => router.push('/board/1')}
+          onClick={() => router.push('/board/..')}
         >
           Add New Page
         </Button>
@@ -89,12 +120,14 @@ function BoardPage() {
               <Button className="w-5 h-10 bg-slate-300" onClick={backHome}>
                 <ArrowLeftSquareIcon />
               </Button>
-              <Button className="w-12 h-10 ">저장</Button>
+              <Button className="w-12 h-10 " onClick={saveTodoTitle}>저장</Button>
             </div>
             <input
               type="text"
               placeholder="Enter title here!"
               className={styles.header__top__input}
+              value={todoTitle}
+              onChange={handleTodoTitleChange}
             ></input>
             <div className="flex items-center justify-start gap-4">
               <small className="text-sm font-medium leading-none text-[#A6A6A6] mx-0">
