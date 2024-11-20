@@ -1,3 +1,5 @@
+import { Toaster } from './toaster';
+
 export { Button, buttonVariants } from './button';
 export { Input } from './input';
 export { SearchBar } from './search-bar';
@@ -17,3 +19,17 @@ export {
     DialogTitle,
     DialogDescription,
   } from './dialog';
+
+  export {
+    type ToastProps,
+    type ToastActionElement,
+    ToastProvider,
+    ToastViewport,
+    Toast,
+    ToastTitle,
+    ToastDescription,
+    ToastClose,
+    ToastAction,
+  } from './toast'
+
+  export {Toaster} from './toaster'

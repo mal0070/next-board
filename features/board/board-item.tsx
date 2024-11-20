@@ -1,8 +1,13 @@
 import { DatePicker, Button } from '@/components/ui';
 import React from 'react';
 import { MarkdownEditorDialog } from './ME-dialog';
+import { BoardData } from '@/app/board/[id]/page';
 
-function BoardItem() {
+interface Props {
+  data: BoardData
+}
+
+function BoardItem({data}:Props) {
   return (
     <div className="flex flex-col gap-3 h-[180px] bg-[#ffffff] rounded-sm p-5">
       <div className="flex flex-col gap-3">
@@ -18,7 +23,7 @@ function BoardItem() {
             htmlFor="todo"
             className="scroll-m-20 text-2xl font-semibold tracking-tight m-3"
           >
-            Board Title
+            {data.title}
           </label>
         </div>
         <div className="flex justify-between">

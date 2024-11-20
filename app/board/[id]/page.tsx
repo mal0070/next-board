@@ -6,20 +6,47 @@ import { Button, SearchBar, Progress, DatePicker } from '@/components/ui';
 import styles from './page.module.scss';
 import BoardItem from '../../../features/board/board-item';
 import { ArrowLeftSquareIcon } from 'lucide-react';
-import { createClient } from '@supabase/supabase-js'
+import { supabase } from '@/lib/supabase';
+
+export interface BoardData {
+  id: number; //board만의 id
+  title: string;
+  from_date: Date;
+  to_date: Date;
+  contents: string;
+  is_checked: boolean;
+}
 
 function BoardPage() {
   const router = useRouter();
 
-// Create a single supabase client for interacting with your database
-const supabase = createClient('https://wufnuxakiprgnvxhffzk.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1Zm51eGFraXByZ252eGhmZnprIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzIwNjQ3OTAsImV4cCI6MjA0NzY0MDc5MH0.ziOcrM711sQ3ffN1AoqIHNzTygmx-HoIIKaI0iHsVIY');
+  const [items, setItems] = React.useState<BoardData[]>([]);
 
+  React.useEffect(() => {
+    getBoards();
+  }, []);
 
-  const [item, setItem] = React.useState([]);
+  async function getBoards() {
+    const { data } = await supabase.from('boards').select();
+    setItems(data || []);
+  }
 
-  const handleClick = () => {
-    console.log('포스트 추가');
-   // setItem()
+  const addBoard = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('boards')
+        .insert({
+          title: '보드',
+          from_date: new Date(),
+          to_date: new Date(),
+          contents: 'dd',
+          is_checked: false
+        }).select();
+
+    } catch (error) {
+      console.error('board insert 오류: ' + error);
+    }
+  
   };
 
   return (
@@ -49,9 +76,11 @@ const supabase = createClient('https://wufnuxakiprgnvxhffzk.supabase.co', 'eyJhb
       <main className="page__main">
         <div className={styles.header}>
           <div className={styles.header__top}>
-            <div className='flex gap-2'>
-            <Button className='w-5 h-10 bg-slate-300'><ArrowLeftSquareIcon/></Button>
-            <Button className='w-12 h-10 '>저장</Button>
+            <div className="flex gap-2">
+              <Button className="w-5 h-10 bg-slate-300">
+                <ArrowLeftSquareIcon />
+              </Button>
+              <Button className="w-12 h-10 ">저장</Button>
             </div>
             <input
               type="text"
@@ -69,16 +98,24 @@ const supabase = createClient('https://wufnuxakiprgnvxhffzk.supabase.co', 'eyJhb
             <div className="flex items-center gap-3">
               <DatePicker label="From" />
               <DatePicker label="To" />
-              <Button className='bg-gray-200 text-gray-500'>View Timeline</Button>
+              <Button className="bg-gray-200 text-gray-500">
+                View Timeline
+              </Button>
             </div>
-            <Button className="bg-[#ea8628] border border-[#E79057] hover:bg-[#ffb235]" onClick={handleClick}>
+            <Button
+              className="bg-[#ea8628] border border-[#E79057] hover:bg-[#ffb235]"
+              onClick={addBoard}
+            >
               Add New Board
             </Button>
           </div>
         </div>
         <div className={styles.area}>
-          <BoardItem/>
-          <BoardItem/>
+          {items.length > 0 ? (
+            items.map((item) => <BoardItem key={item.id} data={item} />)
+          ) : (
+            <p>There is no board yet.</p>
+          )}
         </div>
       </main>
     </div>

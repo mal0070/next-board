@@ -4,37 +4,61 @@ import { Button, SearchBar } from '@/components/ui';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
+//import { useToast } from '@/hooks/use-toast';
 
 interface Todo {
-  id: string;
+  id: number;
   title: string;
-  from_date: string;
-  to_date: string;
-  contents: string;
+  from_date: Date;
+  to_date: Date;
+  boards: string;
 }
 
 function Home() {
   const router = useRouter();
+  // const {toast}  = useToast();
+
+  const createPage = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('todos')
+        .insert({
+          title: '할 일',
+          from_date: new Date(),
+          to_date: new Date(),
+          boards: 'dd',
+        })
+        .select();
+
+      //if (error) throw error;
+
+      if (data) {
+        router.push(`/board/${data[0].id}`);
+        console.log(data);
+      }
+    } catch (error) {
+      console.error('todo insert 오류: ' + error);
+    }
+  };
 
   const [todos, setTodos] = useState<Todo[]>([]);
 
-  useEffect(()=> {
-   getTodos(); 
-  },[]);
+  useEffect(() => {
+    getTodos();
+  }, []);
 
   async function getTodos() {
-    const { data } = await supabase.from('boards').select();
+    const { data } = await supabase.from('todos').select();
     setTodos(data || []); // 데이터가 null일 경우 빈 배열로 설정
   }
-
 
   return (
     <div className="page">
       <aside className="page__aside">
-        <SearchBar placeholder="검색어를 입력하세요"></SearchBar>
+        <SearchBar placeholder="검색어를 입력하세요" />
         <Button
           className="text-[#E79057] bg-white border border-[#E79057] hover:bg-[#ffb235]"
-          onClick={() => router.push('/board/1')}
+          onClick={createPage}
         >
           Add New Page
         </Button>
@@ -44,9 +68,12 @@ function Home() {
             민아의 TODO-BOARD
           </small>
           <ul className="flex flex-col mt-2 bg-[#f5f5f5] rounded-sm text-sm">
-          {todos.length > 0 ? (
+            {todos.length > 0 ? (
               todos.map((todo) => (
-                <li key={todo.id} className="flex items-center gap-2 py-2 px-[10px] ml-0">
+                <li
+                  key={todo.id}
+                  className="flex items-center gap-2 py-2 px-[10px] ml-0"
+                >
                   <div className="h-[10px] w-[10px] bg-[#00f38d]"></div>
                   <p>{todo.title}</p>
                 </li>
@@ -66,7 +93,7 @@ function Home() {
           <p>2. Add boards to page</p>
           <Button
             className="text-[#E79057] bg-transparent border border-[#E79057] hover:bg-[#ffb235]"
-            onClick={() => router.push('/board/1')}
+            onClick={createPage}
           >
             Add New Page
           </Button>

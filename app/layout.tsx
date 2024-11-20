@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./styles/globals.css";
 import { Noto_Sans_KR} from 'next/font/google';
 import './styles/main.scss';
+import { Toaster } from "@/components/ui";
 
 const noto = Noto_Sans_KR({
   subsets: ['latin'],
@@ -34,6 +35,7 @@ export default function RootLayout({
     <html lang="ko">
       <body className={noto.className} >
         {children}
+        <Toaster/>
       </body>
     </html>
   );
