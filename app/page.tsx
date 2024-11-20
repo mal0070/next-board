@@ -4,6 +4,8 @@ import { Button, SearchBar } from '@/components/ui';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
+import { BoardData } from './board/[id]/page';
+import { nanoid } from "nanoid"; // ESM
 //import { useToast } from '@/hooks/use-toast';
 
 interface Todo {
@@ -11,7 +13,7 @@ interface Todo {
   title: string;
   from_date: Date;
   to_date: Date;
-  boards: string;
+  boards_id: number;
 }
 
 function Home() {
@@ -26,7 +28,6 @@ function Home() {
           title: '할 일',
           from_date: new Date(),
           to_date: new Date(),
-          boards: 'dd',
         })
         .select();
 
@@ -71,7 +72,7 @@ function Home() {
                 <li
                   key={todo.id}
                   className="flex items-center gap-2 py-2 px-[10px] ml-0"
-                  onClick={()=> router.push(`/board/${todo.id}`)}
+                  onClick={() => router.push(`/board/${todo.id}`)}
                 >
                   <div className="h-[10px] w-[10px] bg-[#00f38d]"></div>
                   <p>{todo.title}</p>

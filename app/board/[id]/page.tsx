@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { Button, SearchBar, Progress, DatePicker } from '@/components/ui';
 import styles from './page.module.scss';
 import BoardItem from '../../../features/board/board-item';
@@ -15,10 +15,14 @@ export interface BoardData {
   to_date: Date;
   contents: string;
   is_checked: boolean;
+  todo_id: number;
 }
 
 function BoardPage() {
   const router = useRouter();
+
+  const params = useParams();
+  const tid = params.id;
 
   const [items, setItems] = React.useState<BoardData[]>([]);
 
@@ -27,7 +31,7 @@ function BoardPage() {
   }, []);
 
   async function getBoards() {
-    const { data } = await supabase.from('boards').select();
+    const { data } = await supabase.from('boards').select().eq('todo_id', tid);
     setItems(data || []);
   }
 
@@ -40,7 +44,8 @@ function BoardPage() {
           from_date: new Date(),
           to_date: new Date(),
           contents: 'dd',
-          is_checked: false
+          is_checked: false,
+          todo_id: tid
         }).select();
 
     } catch (error) {
