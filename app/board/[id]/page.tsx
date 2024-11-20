@@ -5,9 +5,15 @@ import { useRouter } from 'next/navigation';
 import { Button, SearchBar, Progress, DatePicker } from '@/components/ui';
 import styles from './page.module.scss';
 import BoardItem from '../../../features/board/board-item';
+import { ArrowLeftSquareIcon } from 'lucide-react';
+import { createClient } from '@supabase/supabase-js'
 
 function BoardPage() {
   const router = useRouter();
+
+// Create a single supabase client for interacting with your database
+const supabase = createClient('https://wufnuxakiprgnvxhffzk.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1Zm51eGFraXByZ252eGhmZnprIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzIwNjQ3OTAsImV4cCI6MjA0NzY0MDc5MH0.ziOcrM711sQ3ffN1AoqIHNzTygmx-HoIIKaI0iHsVIY');
+
 
   const [item, setItem] = React.useState([]);
 
@@ -43,6 +49,10 @@ function BoardPage() {
       <main className="page__main">
         <div className={styles.header}>
           <div className={styles.header__top}>
+            <div className='flex gap-2'>
+            <Button className='w-5 h-10 bg-slate-300'><ArrowLeftSquareIcon/></Button>
+            <Button className='w-12 h-10 '>저장</Button>
+            </div>
             <input
               type="text"
               placeholder="Enter title here!"
