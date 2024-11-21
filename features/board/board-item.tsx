@@ -2,12 +2,24 @@ import { DatePicker, Button } from '@/components/ui';
 import React from 'react';
 import { MarkdownEditorDialog } from './ME-dialog';
 import { BoardData } from '@/app/board/[id]/page';
+import { supabase } from '@/lib/supabase';
 
 interface Props {
-  data: BoardData
+  data: BoardData;
+  onDelete: (id:number) => void; //부모 컴포넌트에서 상태 업데이트
 }
 
-function BoardItem({data}:Props) {
+function BoardItem({ data, onDelete }: Props) {
+  const deleteBoard = async (id: number) => {
+    try {
+      const { error } = await supabase.from('boards').delete().eq('id', id); //DB에서 제거
+      if (error) throw error;
+      onDelete(id); //부모 컴포넌트에 삭제 알림
+    } catch (error) {
+      console.error('board delete 오류: ' + error);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-3 h-[180px] bg-[#ffffff] rounded-sm p-5">
       <div className="flex flex-col gap-3">
@@ -33,7 +45,12 @@ function BoardItem({data}:Props) {
           </div>
           <div className="flex gap-3">
             <Button className="bg-transparent text-gray-500">Duplicate</Button>
-            <Button className="bg-transparent text-gray-500">Delete</Button>
+            <Button
+              className="bg-transparent text-gray-500"
+              onClick={() => deleteBoard(data.id)}
+            >
+              Delete
+            </Button>
           </div>
         </div>
       </div>

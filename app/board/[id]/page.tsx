@@ -85,6 +85,10 @@ function BoardPage() {
   
   };
 
+  const handleDelete = (id:number) => { //UI업데이트
+    setItems(prevItem => prevItem.filter(item => item.id !== id));
+  }
+
   const backHome = () => {
     router.push('/');
   }
@@ -154,7 +158,7 @@ function BoardPage() {
         </div>
         <div className={styles.area}>
           {items.length > 0 ? (
-            items.map((item) => <BoardItem key={item.id} data={item} />)
+            items.map((item) => <BoardItem key={item.id} data={item} onDelete={handleDelete} />)
           ) : (
             <p>There is no board yet.</p>
           )}
