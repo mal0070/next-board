@@ -6,10 +6,11 @@ import { supabase } from '@/lib/supabase';
 
 interface Props {
   data: BoardData;
-  onDelete: (id:number) => void; //부모 컴포넌트에서 상태 업데이트
+  onDelete: (id: number) => void; //부모 컴포넌트에서 상태 업데이트
+  onChange: (id: number, checkedValue: boolean ) => void;
 }
 
-function BoardItem({ data, onDelete }: Props) {
+function BoardItem({ data, onDelete, onChange }: Props) {
   const deleteBoard = async (id: number) => {
     try {
       const { error } = await supabase.from('boards').delete().eq('id', id); //DB에서 제거
@@ -19,6 +20,10 @@ function BoardItem({ data, onDelete }: Props) {
       console.error('board delete 오류: ' + error);
     }
   };
+
+  const detectCheckValueChange = () => {
+    onChange(data.id, !data.is_checked);
+  }
 
   return (
     <div className="flex flex-col gap-3 h-[180px] bg-[#ffffff] rounded-sm p-5">
@@ -30,12 +35,14 @@ function BoardItem({ data, onDelete }: Props) {
             id="todo"
             name="todo"
             className="w-[20px] h-[20px]"
-          />
+            checked={data.is_checked}
+            onChange={detectCheckValueChange}
+          /> 
           <label
             htmlFor="todo"
             className="scroll-m-20 text-2xl font-semibold tracking-tight m-3"
           >
-            {data.title}
+          {data.title}
           </label>
         </div>
         <div className="flex justify-between">

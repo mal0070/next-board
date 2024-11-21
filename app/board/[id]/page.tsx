@@ -37,8 +37,67 @@ function BoardPage() {
     setItems(data || []);
   }
 
+  const addBoard = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('boards')
+        .insert({
+          title: '제목없음',
+          from_date: new Date(),
+          to_date: new Date(),
+          contents: '',
+          is_checked: false,
+          todo_id: tid,
+        })
+        .select();
+
+      if (data) {
+        console.log(data);
+        getBoards();
+      }
+    } catch (error) {
+      console.error('board insert 오류: ' + error);
+    }
+  };
+
+  /*const handleBoardChange = (id: number, updatedBoard: Partial<BoardData>) => {
+    setItems(prevItems => prevItems.map(item => item.id === id ? {...item, ...updatedBoard} : item));
+  }*/
+
+  const handleBoardChange = (changeId: number, changeCheckedValue: boolean) => {
+    setItems((prevItems) =>
+      prevItems.map((item) =>
+        item.id === changeId
+          ? { ...item, is_checked: changeCheckedValue }
+          : item
+      )
+    );
+  };
+
+  const updateBoardChange = async () => {
+    try {
+      const board = items.find((item) => item.todo_id === Number(tid));
+      if(!board) return;
+
+      const { error } = await supabase.from('boards').update(board).eq('id', board.id);
+      if (error) throw error;
+      console.log('update board!');
+    } catch (error) {
+      console.error('updating board error: ' + error);
+    }
+  };
+
+  const handleDelete = (id: number) => {
+    //UI업데이트
+    setItems((prevItem) => prevItem.filter((item) => item.id !== id));
+  };
+
   async function getTodoTitle() {
-    const { data } = await supabase.from('todos').select().eq('id', tid).single();
+    const { data } = await supabase
+      .from('todos')
+      .select()
+      .eq('id', tid)
+      .single();
     setTodoTitle(data?.title || '');
   }
 
@@ -46,7 +105,7 @@ function BoardPage() {
     setTodoTitle(e.target.value);
   };
 
-  const saveTodoTitle = async () => {
+  const updateTodoTitle = async () => {
     try {
       const { error } = await supabase
         .from('todos')
@@ -61,37 +120,14 @@ function BoardPage() {
     }
   };
 
-  const addBoard = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('boards')
-        .insert({
-          title: '보드',
-          from_date: new Date(),
-          to_date: new Date(),
-          contents: 'dd',
-          is_checked: false,
-          todo_id: tid
-        }).select();
-
-        if(data) {
-          console.log(data);
-          getBoards();
-        }
-
-    } catch (error) {
-      console.error('board insert 오류: ' + error);
-    }
-  
+  const saveChange = async () => {
+    await updateTodoTitle();
+    await updateBoardChange();
   };
-
-  const handleDelete = (id:number) => { //UI업데이트
-    setItems(prevItem => prevItem.filter(item => item.id !== id));
-  }
 
   const backHome = () => {
     router.push('/');
-  }
+  };
 
   return (
     <div className="page">
@@ -124,7 +160,9 @@ function BoardPage() {
               <Button className="w-5 h-10 bg-slate-300" onClick={backHome}>
                 <ArrowLeftSquareIcon />
               </Button>
-              <Button className="w-12 h-10 " onClick={saveTodoTitle}>저장</Button>
+              <Button className="w-12 h-10 " onClick={saveChange}>
+                저장
+              </Button>
             </div>
             <input
               type="text"
@@ -158,7 +196,14 @@ function BoardPage() {
         </div>
         <div className={styles.area}>
           {items.length > 0 ? (
-            items.map((item) => <BoardItem key={item.id} data={item} onDelete={handleDelete} />)
+            items.map((item) => (
+              <BoardItem
+                key={item.id}
+                data={item}
+                onDelete={handleDelete}
+                onChange={handleBoardChange}
+              />
+            ))
           ) : (
             <p>There is no board yet.</p>
           )}
