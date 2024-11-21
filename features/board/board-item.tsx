@@ -1,5 +1,5 @@
 import { DatePicker, Button } from '@/components/ui';
-import React from 'react';
+import React, { useState } from 'react';
 import { MarkdownEditorDialog } from './ME-dialog';
 import { BoardData } from '@/app/board/[id]/page';
 import { supabase } from '@/lib/supabase';
@@ -25,6 +25,9 @@ function BoardItem({ data, onDelete, onChange }: Props) {
     onChange(data.id, !data.is_checked);
   }
 
+  const [itemStartDate, setItemStartDate] = useState<Date>(new Date());
+  const [itemEndDate, setItemEndDate] = useState<Date>(new Date());
+
   return (
     <div className="flex flex-col gap-3 h-[180px] bg-[#ffffff] rounded-sm p-5">
       <div className="flex flex-col gap-3">
@@ -47,8 +50,8 @@ function BoardItem({ data, onDelete, onChange }: Props) {
         </div>
         <div className="flex justify-between">
           <div className="flex items-center gap-6">
-            <DatePicker label="From" />
-            <DatePicker label="To" />
+            <DatePicker label="From" isReadOnly={true} onSetDate={setItemStartDate}/>
+            <DatePicker label="To" isReadOnly={true} onSetDate={setItemEndDate}/>
           </div>
           <div className="flex gap-3">
             <Button className="bg-transparent text-gray-500">Duplicate</Button>

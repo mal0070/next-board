@@ -14,11 +14,24 @@ import {
 
 interface Props {
   label: string;
+  isReadOnly: boolean;
+  value?: Date;
+  onSetDate: (date: Date) => void;
 }
 
-function DatePicker({ label }: Props) {
+function DatePicker({ label,isReadOnly,value, onSetDate }: Props) {
   const [date, setDate] = React.useState<Date>();
 
+  React.useEffect(()=> {
+    if(value) setDate(value);
+  },[value]);;
+
+  React.useEffect(() => {
+    if (onSetDate) {
+      if(date) onSetDate(date);
+    }
+}, [date, onSetDate]);
+  
   return (
     <div className="max-w-64 flex items-center gap-3">
       <small className="text-sm font-medium leading-none text-[#6D6D6D]">
@@ -32,6 +45,7 @@ function DatePicker({ label }: Props) {
               'w-[200px] justify-start text-left font-normal',
               !date && 'text-muted-foreground'
             )}
+            disabled={isReadOnly}
           >
             <CalendarIcon />
             {date ? format(date, 'PPP') : <span>날짜를 선택해주세요.</span>}

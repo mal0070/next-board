@@ -26,10 +26,12 @@ function BoardPage() {
 
   const [items, setItems] = React.useState<BoardData[]>([]);
   const [todoTitle, setTodoTitle] = React.useState<string>('');
+  const [todoStartDate, setTodoStartDate] = React.useState<Date>(new Date());
+  const [todoEndDate, setTodoEndDate] = React.useState<Date>(new Date());
 
   React.useEffect(() => {
     getBoards();
-    getTodoTitle();
+    getTodoTitleAndDate();
   }, [tid]);
 
   async function getBoards() {
@@ -92,36 +94,50 @@ function BoardPage() {
     setItems((prevItem) => prevItem.filter((item) => item.id !== id));
   };
 
-  async function getTodoTitle() {
+  async function getTodoTitleAndDate() {
     const { data } = await supabase
       .from('todos')
       .select()
       .eq('id', tid)
       .single();
+
     setTodoTitle(data?.title || '');
+    setTodoStartDate(data?.from_date || null);
+    setTodoEndDate(data?.to_date || null);
   }
 
   const handleTodoTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTodoTitle(e.target.value);
   };
 
-  const updateTodoTitle = async () => {
+
+
+  const updateTodoTitleAndDate = async () => {
     try {
       const { error } = await supabase
         .from('todos')
-        .update({ title: todoTitle })
+        .update({ title: todoTitle, from_date: todoStartDate, to_date: todoEndDate})
         .eq('id', tid);
 
       if (error) throw error;
 
       console.log('Todo title updated successfully');
+
+      //re-rendering
+      setTodoTitle(todoTitle);
+      setTodoStartDate(todoStartDate);
+      setTodoEndDate(todoEndDate);
     } catch (error) {
       console.error('Error updating todo title:', error);
     }
   };
 
+  
+
+  //const updateTodoDate = async ()
+
   const saveChange = async () => {
-    await updateTodoTitle();
+    await updateTodoTitleAndDate();
     await updateBoardChange();
   };
 
@@ -180,8 +196,8 @@ function BoardPage() {
           </div>
           <div className={styles.header__bottom}>
             <div className="flex items-center gap-3">
-              <DatePicker label="From" />
-              <DatePicker label="To" />
+              <DatePicker label="From" isReadOnly={false} value={todoStartDate} onSetDate={() => setTodoStartDate(todoStartDate)}/>
+              <DatePicker label="To" isReadOnly={false} value={todoEndDate} onSetDate={() => setTodoEndDate(todoEndDate)} />
               <Button className="bg-gray-200 text-gray-500">
                 View Timeline
               </Button>
