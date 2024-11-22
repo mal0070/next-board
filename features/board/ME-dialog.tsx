@@ -16,6 +16,7 @@ import {
 import { supabase } from '@/lib/supabase';
 import MarkdownEditor from '@uiw/react-markdown-editor';
 import { useState, useEffect } from 'react';
+import { useToast } from '@/hooks/use-toast';
 
 interface Props {
   children: React.ReactNode;
@@ -25,6 +26,7 @@ interface Props {
 
 function MarkdownEditorDialog({ children, boardData, onChange }: Props) {
   const [itemData, setItemData] = useState<BoardData>(boardData);
+  const { toast } = useToast();
 
   useEffect(() => {
     getBoardData();
@@ -102,7 +104,13 @@ function MarkdownEditorDialog({ children, boardData, onChange }: Props) {
             <Button
               type="submit"
               className="text-white bg-[#E79057] hover:bg-[#E26F24] hover:ring-1 hover:ring-[#E26F24] hover:ring-offset-1 active:bg-[#D5753D] hover:shadow-lg"
-              onClick={() => onChange(itemData)}
+              onClick={() => {
+                onChange(itemData);
+                toast({
+                  title: 'TODO-BOARD 콘텐츠가 올바르게 등록되었습니다.',
+                  description: '등록한 TODO-BOARD의 마감일을 지켜 하루를 채워가세요!',
+                });
+              }}
             >
               등록
             </Button>

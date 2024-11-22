@@ -31,13 +31,8 @@ function BoardItem({ data, onDelete, onChange }: Props) {
 
   const handleBoardChange = (changedBoardData: BoardData) => {
     setItem(changedBoardData); //UI
-
-    toast({
-      title: 'TODO-BOARD 콘텐츠가 올바르게 등록되었습니다.',
-      description: '등록한 TODO-BOARD의 마감일을 지켜 하루를 채워가세요!',
-    });
-
     onChange(changedBoardData); //부모 컴포넌트에 변경 알림
+
   };
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
