@@ -1,5 +1,5 @@
 import { DatePicker, Button } from '@/components/ui';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { MarkdownEditorDialog } from './ME-dialog';
 import { BoardData } from '@/app/board/[id]/page';
 import { supabase } from '@/lib/supabase';
@@ -7,10 +7,16 @@ import { supabase } from '@/lib/supabase';
 interface Props {
   data: BoardData;
   onDelete: (id: number) => void; //부모 컴포넌트에서 상태 업데이트
-  onChange: (id: number, checkedValue: boolean ) => void;
+  onChange: (changedBoardData: BoardData) => void;
 }
 
 function BoardItem({ data, onDelete, onChange }: Props) {
+  const [item, setItem] = useState<BoardData>(data);
+
+  useEffect(() => {
+    setItem(data);
+  }, [data]);
+
   const deleteBoard = async (id: number) => {
     try {
       const { error } = await supabase.from('boards').delete().eq('id', id); //DB에서 제거
@@ -21,12 +27,20 @@ function BoardItem({ data, onDelete, onChange }: Props) {
     }
   };
 
-  const detectCheckValueChange = () => {
-    onChange(data.id, !data.is_checked);
+ const handleBoardChange = (changedBoardData: BoardData) => {
+    setItem(changedBoardData); //UI
+    onChange(changedBoardData); //부모 컴포넌트에 변경 알림
   }
 
-  const [itemStartDate, setItemStartDate] = useState<Date>(new Date());
-  const [itemEndDate, setItemEndDate] = useState<Date>(new Date());
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const updatedData = { ...item, is_checked: e.target.checked };
+    handleBoardChange(updatedData);
+  };
+
+  const handleDateChange = (field: 'from_date' | 'to_date') => (date: Date) => {
+    const updatedData = { ...item, [field]: date };
+    handleBoardChange(updatedData);
+  };
 
   return (
     <div className="flex flex-col gap-3 h-[180px] bg-[#ffffff] rounded-sm p-5">
@@ -35,29 +49,29 @@ function BoardItem({ data, onDelete, onChange }: Props) {
         <div className="items-center">
           <input
             type="checkbox"
-            id="todo"
+            id={`todo-${item.id}`}
             name="todo"
             className="w-[20px] h-[20px]"
-            checked={data.is_checked}
-            onChange={detectCheckValueChange}
+            checked={item.is_checked}
+            onChange={handleCheckboxChange}
           /> 
           <label
-            htmlFor="todo"
+            htmlFor={`todo-${item.id}`}
             className="scroll-m-20 text-2xl font-semibold tracking-tight m-3"
           >
-          {data.title}
+          {item.title}
           </label>
         </div>
         <div className="flex justify-between">
           <div className="flex items-center gap-6">
-            <DatePicker label="From" isReadOnly={true} onSetDate={setItemStartDate}/>
-            <DatePicker label="To" isReadOnly={true} onSetDate={setItemEndDate}/>
+            <DatePicker label="From" isReadOnly={true} value={item.from_date} onSetDate={handleDateChange('from_date')}/>
+            <DatePicker label="To" isReadOnly={true} value={item.to_date} onSetDate={handleDateChange('to_date')}/>
           </div>
           <div className="flex gap-3">
             <Button className="bg-transparent text-gray-500">Duplicate</Button>
             <Button
               className="bg-transparent text-gray-500"
-              onClick={() => deleteBoard(data.id)}
+              onClick={() => deleteBoard(item.id)}
             >
               Delete
             </Button>
@@ -66,7 +80,7 @@ function BoardItem({ data, onDelete, onChange }: Props) {
       </div>
       <div className="flex flex-col items-center gap-5">
         <hr className="w-full solid"></hr>
-        <MarkdownEditorDialog boardData={data}>
+        <MarkdownEditorDialog boardData={item} onChange={handleBoardChange}>
           <Button variant={'ghost'} className="text-gray-500 bg-transparent">
             Add Contents
           </Button>

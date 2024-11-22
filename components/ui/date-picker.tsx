@@ -20,17 +20,9 @@ interface Props {
 }
 
 function DatePicker({ label,isReadOnly,value, onSetDate }: Props) {
-  const [date, setDate] = React.useState<Date>();
-
-  React.useEffect(()=> {
-    if(value) setDate(value);
-  },[value]);;
-
-  React.useEffect(() => {
-    if (onSetDate) {
-      if(date) onSetDate(date);
-    }
-}, [date, onSetDate]);
+  const handleDateSelect = (selectedDate: Date | undefined) => {
+    if(selectedDate && !isReadOnly) onSetDate(selectedDate);
+  }
   
   return (
     <div className="max-w-64 flex items-center gap-3">
@@ -43,19 +35,19 @@ function DatePicker({ label,isReadOnly,value, onSetDate }: Props) {
             variant={'outline'}
             className={cn(
               'w-[200px] justify-start text-left font-normal',
-              !date && 'text-muted-foreground'
+              !value && 'text-muted-foreground'
             )}
             disabled={isReadOnly}
           >
             <CalendarIcon />
-            {date ? format(date, 'PPP') : <span>날짜를 선택해주세요.</span>}
+            {value ? format(value, 'PPP') : <span>날짜를 선택해주세요.</span>}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0">
           <Calendar
             mode="single"
-            selected={date}
-            onSelect={setDate}
+            selected={value}
+            onSelect={handleDateSelect}
             initialFocus
           />
         </PopoverContent>

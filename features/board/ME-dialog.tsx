@@ -20,33 +20,44 @@ import { useState, useEffect } from 'react';
 interface Props {
   children: React.ReactNode;
   boardData: BoardData;
+  onChange: (changedBoardData:BoardData) => void;
 }
 
-function MarkdownEditorDialog({ children, boardData }: Props) {
- // const [itemData, setItemData] = useState<BoardData>();
-  const [title, setTitle] = useState<string>('');
-  const [startDate, setStartDate] = useState<Date | undefined>();
-  const [endDate, setEndDate] = useState<Date | undefined>();
-  const [content, setContent] = useState<string>('**Hello, World!!**');
+function MarkdownEditorDialog({ children, boardData, onChange }: Props) {
+  const [itemData, setItemData] = useState<BoardData>(boardData);
 
-  useEffect(()=> {
+  useEffect(() => {
     getBoardData();
-  },[]);
+  }, []);
 
-  const getBoardData = async()=> {
-    const { data } = await supabase.from('boards').select().eq('id', boardData.id).single();
-    setTitle(data?.title);
-    setStartDate(data?.from_date);
-    setEndDate(data?.to_date);
-    setContent(data?.contents);
-  }
-
-  const updateBoardData = (e: React.ChangeEvent<HTMLInputElement>) => {
-    /** 생성한 페이지의 전체 데이터를 조회: 특정 TODO-LIST의 id 값을 기준으로 조회 */
-
+  const getBoardData = async () => {
+    const { data } = await supabase
+      .from('boards')
+      .select()
+      .eq('id', boardData.id)
+      .single();
+    
+    if (data) setItemData(data);
   };
 
-  //부모 컴포넌트(item)에서 리렌더링(UI반영)
+/* const handleDataChange = (field: keyof BoardData, value:any) => {
+    setItemData((prevData)=> ({...prevData, [field]:value}));
+  } //각 필드 별로 set할 수 있도록 설정*/
+
+  
+  const handleDataChange = (field: keyof BoardData, value: any) => {
+    setItemData((prevData) => {
+      const newData = {...prevData, [field]: value};
+      console.log('Updated itemData:', newData);
+      return newData;
+    });
+  }
+
+
+  //부모 컴포넌트(item)에서
+
+  //save -> db update
+  //리렌더링(UI반영)
   //1. 제목, 날짜
   //2.Add Content 버튼 없애고, content표시 + 하단에 edit버튼 추가
 
@@ -62,8 +73,8 @@ function MarkdownEditorDialog({ children, boardData }: Props) {
                 placeholder="게시물의 제목을 입력해주세요."
                 className="w-full text-xl outline-none bg-transparent"
                 name="title"
-                value={title}
-                onChange={(event)=>{setTitle(()=>event.target.value)}}
+                value={itemData.title}
+                onChange={(event)=>handleDataChange('title', event.target.value )}
               />
             </div>
           </DialogTitle>
@@ -74,14 +85,14 @@ function MarkdownEditorDialog({ children, boardData }: Props) {
         <div className="flex items-center gap-5">
           <DatePicker
             label={'From'}
-            value={startDate}
-            onSetDate={() => setStartDate(startDate)}
+            value={itemData.from_date}
+            onSetDate={(date: Date) => handleDataChange('from_date', date)}
             isReadOnly={false}
           />
           <DatePicker
             label={'To'}
-            value={endDate}
-            onSetDate={() => setEndDate(endDate)}
+            value={itemData.to_date}
+            onSetDate={(date: Date) => handleDataChange('to_date', date)}
             isReadOnly={false}
           />
         </div>
@@ -94,13 +105,15 @@ function MarkdownEditorDialog({ children, boardData }: Props) {
               취소
             </Button>
           </DialogClose>
-          <Button
-            type="submit"
-            className="text-white bg-[#E79057] hover:bg-[#E26F24] hover:ring-1 hover:ring-[#E26F24] hover:ring-offset-1 active:bg-[#D5753D] hover:shadow-lg"
-            onClick={()=> updateBoardData}
-          >
-            등록
-          </Button>
+          <DialogClose asChild>
+            <Button
+              type="submit"
+              className="text-white bg-[#E79057] hover:bg-[#E26F24] hover:ring-1 hover:ring-[#E26F24] hover:ring-offset-1 active:bg-[#D5753D] hover:shadow-lg"
+              onClick={() => onChange(itemData)}
+            >
+              등록
+            </Button>
+          </DialogClose>
         </DialogFooter>
       </DialogContent>
     </Dialog>

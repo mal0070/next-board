@@ -63,26 +63,32 @@ function BoardPage() {
     }
   };
 
-  /*const handleBoardChange = (id: number, updatedBoard: Partial<BoardData>) => {
-    setItems(prevItems => prevItems.map(item => item.id === id ? {...item, ...updatedBoard} : item));
-  }*/
-
-  const handleBoardChange = (changeId: number, changeCheckedValue: boolean) => {
+  /*const handleBoardChange = (changedBoardData: BoardData) => {
     setItems((prevItems) =>
       prevItems.map((item) =>
-        item.id === changeId
-          ? { ...item, is_checked: changeCheckedValue }
-          : item
+        item.id === changedBoardData.id ? changedBoardData : item
       )
     );
-  };
+  };*/
+
+  const handleBoardChange = React.useCallback((changedBoardData: BoardData) => {
+    setItems((prevItems) =>
+      prevItems.map((item) =>
+        item.id === changedBoardData.id ? changedBoardData : item
+      )
+    );
+  }, []);
+  
 
   const updateBoardChange = async () => {
     try {
       const board = items.find((item) => item.todo_id === Number(tid));
-      if(!board) return;
+      if (!board) return;
 
-      const { error } = await supabase.from('boards').update(board).eq('id', board.id);
+      const { error } = await supabase
+        .from('boards')
+        .update(board)
+        .eq('id', board.id);
       if (error) throw error;
       console.log('update board!');
     } catch (error) {
@@ -115,7 +121,11 @@ function BoardPage() {
     try {
       const { error } = await supabase
         .from('todos')
-        .update({ title: todoTitle, from_date: todoStartDate, to_date: todoEndDate})
+        .update({
+          title: todoTitle,
+          from_date: todoStartDate,
+          to_date: todoEndDate,
+        })
         .eq('id', tid);
 
       if (error) throw error;
@@ -142,7 +152,7 @@ function BoardPage() {
 
   return (
     <div className="page">
-      <AsidePage/>
+      <AsidePage />
       <main className="page__main">
         <div className={styles.header}>
           <div className={styles.header__top}>
@@ -170,8 +180,18 @@ function BoardPage() {
           </div>
           <div className={styles.header__bottom}>
             <div className="flex items-center gap-3">
-              <DatePicker label="From" isReadOnly={false} value={todoStartDate} onSetDate={() => setTodoStartDate(todoStartDate)}/>
-              <DatePicker label="To" isReadOnly={false} value={todoEndDate} onSetDate={() => setTodoEndDate(todoEndDate)} />
+              <DatePicker
+                label="From"
+                isReadOnly={false}
+                value={todoStartDate}
+                onSetDate={(date) => setTodoStartDate(date)}
+              />
+              <DatePicker
+                label="To"
+                isReadOnly={false}
+                value={todoEndDate}
+                onSetDate={(date) => setTodoEndDate(date)}
+              />
               <Button className="bg-gray-200 text-gray-500">
                 View Timeline
               </Button>
