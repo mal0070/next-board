@@ -111,8 +111,6 @@ function BoardPage() {
     setTodoTitle(e.target.value);
   };
 
-
-
   const updateTodoTitleAndDate = async () => {
     try {
       const { error } = await supabase
@@ -132,10 +130,6 @@ function BoardPage() {
       console.error('Error updating todo title:', error);
     }
   };
-
-  
-
-  //const updateTodoDate = async ()
 
   const saveChange = async () => {
     await updateTodoTitleAndDate();

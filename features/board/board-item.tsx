@@ -66,7 +66,7 @@ function BoardItem({ data, onDelete, onChange }: Props) {
       </div>
       <div className="flex flex-col items-center gap-5">
         <hr className="w-full solid"></hr>
-        <MarkdownEditorDialog>
+        <MarkdownEditorDialog boardData={data}>
           <Button variant={'ghost'} className="text-gray-500 bg-transparent">
             Add Contents
           </Button>
