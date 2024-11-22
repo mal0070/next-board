@@ -53,14 +53,6 @@ function MarkdownEditorDialog({ children, boardData, onChange }: Props) {
     });
   }
 
-
-  //부모 컴포넌트(item)에서
-
-  //save -> db update
-  //리렌더링(UI반영)
-  //1. 제목, 날짜
-  //2.Add Content 버튼 없애고, content표시 + 하단에 edit버튼 추가
-
   return (
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>

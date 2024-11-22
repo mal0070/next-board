@@ -29,6 +29,7 @@ function BoardPage() {
   const [todoTitle, setTodoTitle] = React.useState<string>('');
   const [todoStartDate, setTodoStartDate] = React.useState<Date>(new Date());
   const [todoEndDate, setTodoEndDate] = React.useState<Date>(new Date());
+  const [progress, setProgress] = React.useState<number>(0);
 
   React.useEffect(() => {
     getBoards();
@@ -38,6 +39,10 @@ function BoardPage() {
   async function getBoards() {
     const { data } = await supabase.from('boards').select().eq('todo_id', tid);
     setItems(data || []);
+    
+    let count = 0;
+    data?.forEach((i)=> i.is_checked ? count++ : 0);
+    setProgress(count);
   }
 
   const addBoard = async () => {
@@ -62,14 +67,6 @@ function BoardPage() {
       console.error('board insert 오류: ' + error);
     }
   };
-
-  /*const handleBoardChange = (changedBoardData: BoardData) => {
-    setItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === changedBoardData.id ? changedBoardData : item
-      )
-    );
-  };*/
 
   const handleBoardChange = React.useCallback((changedBoardData: BoardData) => {
     setItems((prevItems) =>
@@ -173,9 +170,9 @@ function BoardPage() {
             ></input>
             <div className="flex items-center justify-start gap-4">
               <small className="text-sm font-medium leading-none text-[#A6A6A6] mx-0">
-                0/0 Completed
+                {progress}/{items.length} Completed
               </small>
-              <Progress className="w-60 h-[10px]" value={33}></Progress>
+              <Progress className="w-60 h-[10px]" value={progress} max={items.length}></Progress>
             </div>
           </div>
           <div className={styles.header__bottom}>
