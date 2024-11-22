@@ -21,8 +21,8 @@ function AsidePage() {
         .from('todos')
         .insert({
           title: '제목을 입력하세요.',
-          from_date: new Date(),
-          to_date: new Date(),
+          from_date: null,
+          to_date: null,
         })
         .select();
 

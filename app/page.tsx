@@ -29,9 +29,9 @@ function Home() {
       const { data, error } = await supabase
         .from('todos')
         .insert({
-          title: '제목을 입력하세요.',
-          from_date: new Date(),
-          to_date: new Date(),
+          title: null,
+          from_date: null,
+          to_date: null,
         })
         .select();
 

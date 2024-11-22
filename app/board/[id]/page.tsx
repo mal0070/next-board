@@ -8,6 +8,7 @@ import BoardItem from '../../../features/board/board-item';
 import { ArrowLeftSquareIcon } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import AsidePage from '@/features/aside/aside-page';
+import { useToast } from "@/hooks/use-toast";
 
 export interface BoardData {
   id: number; //board만의 id
@@ -21,20 +22,29 @@ export interface BoardData {
 
 function BoardPage() {
   const router = useRouter();
+  const { toast } = useToast();
 
   const params = useParams();
   const tid = params.id;
 
   const [items, setItems] = React.useState<BoardData[]>([]);
   const [todoTitle, setTodoTitle] = React.useState<string>('');
-  const [todoStartDate, setTodoStartDate] = React.useState<Date>(new Date());
-  const [todoEndDate, setTodoEndDate] = React.useState<Date>(new Date());
+  const [todoStartDate, setTodoStartDate] = React.useState<Date>();
+  const [todoEndDate, setTodoEndDate] = React.useState<Date>();
   const [progress, setProgress] = React.useState<number>(0);
 
   React.useEffect(() => {
     getBoards();
     getTodoTitleAndDate();
   }, [tid]);
+
+  async function deleteTodo() {
+    if (confirm("이 TODO 페이지를 삭제하시겠습니까?") === true){
+      const { data } = await supabase.from('todos').delete().eq('id',tid); 
+      router.push('/');
+    }
+    return;
+  }
 
   async function getBoards() {
     const { data } = await supabase.from('boards').select().eq('todo_id', tid);
@@ -96,6 +106,10 @@ function BoardPage() {
   const handleDelete = (id: number) => {
     //UI업데이트
     setItems((prevItem) => prevItem.filter((item) => item.id !== id));
+    toast({
+      title: "선택하신 TODO-BOARD가 삭제되었습니다.",
+      description: "새로운 TODO-BOARD를 생성하려면 'Add New Board' 버튼을 눌러주세요!",
+  });
   };
 
   async function getTodoTitleAndDate() {
@@ -127,7 +141,10 @@ function BoardPage() {
 
       if (error) throw error;
 
-      console.log('Todo title updated successfully');
+      toast({
+        title: "TODO-LIST 수정을 완료하였습니다.",
+        description: "수정한 TODO-LIST의 마감일을 꼭 지켜주세요!",
+    });
 
       //re-rendering
       setTodoTitle(todoTitle);
@@ -139,6 +156,14 @@ function BoardPage() {
   };
 
   const saveChange = async () => {
+    if (!todoTitle || !todoStartDate || !todoEndDate) {
+      toast({
+          variant: "destructive",
+          title: "기입되지 않은 데이터(값)가 있습니다.",
+          description: "수정한 TODO-LIST의 마감일을 꼭 지켜주세요!",
+      });
+      return;
+  }
     await updateTodoTitleAndDate();
     await updateBoardChange();
   };
@@ -153,13 +178,18 @@ function BoardPage() {
       <main className="page__main">
         <div className={styles.header}>
           <div className={styles.header__top}>
-            <div className="flex gap-2">
+            <div className="flex justify-between">
               <Button className="w-5 h-10 bg-slate-300" onClick={backHome}>
                 <ArrowLeftSquareIcon />
               </Button>
+              <div className='flex gap-2'>
               <Button className="w-12 h-10 " onClick={saveChange}>
                 저장
               </Button>
+              <Button className="w-12 h-10" onClick={deleteTodo}>
+                삭제
+              </Button>
+              </div>
             </div>
             <input
               type="text"

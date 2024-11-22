@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { MarkdownEditorDialog } from './ME-dialog';
 import { BoardData } from '@/app/board/[id]/page';
 import { supabase } from '@/lib/supabase';
+import { useToast } from '@/hooks/use-toast';
 
 interface Props {
   data: BoardData;
@@ -12,6 +13,7 @@ interface Props {
 
 function BoardItem({ data, onDelete, onChange }: Props) {
   const [item, setItem] = useState<BoardData>(data);
+  const { toast } = useToast();
 
   useEffect(() => {
     setItem(data);
@@ -29,6 +31,12 @@ function BoardItem({ data, onDelete, onChange }: Props) {
 
   const handleBoardChange = (changedBoardData: BoardData) => {
     setItem(changedBoardData); //UI
+
+    toast({
+      title: 'TODO-BOARD 콘텐츠가 올바르게 등록되었습니다.',
+      description: '등록한 TODO-BOARD의 마감일을 지켜 하루를 채워가세요!',
+    });
+
     onChange(changedBoardData); //부모 컴포넌트에 변경 알림
   };
 
@@ -93,7 +101,10 @@ function BoardItem({ data, onDelete, onChange }: Props) {
         <div className="flex flex-col">
           <div>{item.contents}</div>
           <MarkdownEditorDialog boardData={item} onChange={handleBoardChange}>
-            <Button variant={'ghost'} className="text-gray-500 bg-transparent w-auto">
+            <Button
+              variant={'ghost'}
+              className="text-gray-500 bg-transparent w-auto"
+            >
               Edit Contents
             </Button>
           </MarkdownEditorDialog>
