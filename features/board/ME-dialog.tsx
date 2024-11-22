@@ -98,7 +98,8 @@ function MarkdownEditorDialog({ children, boardData, onChange }: Props) {
         </div>
 
         {/* 마크다운 에디터 영역 */}
-        <MarkdownEditor className="h-[320px]" />
+        <MarkdownEditor className="h-[320px]" value={itemData.contents}
+          onChange={(value)=>handleDataChange('contents', value)} />
         <DialogFooter>
           <DialogClose asChild>
             <Button type="submit" variant={'outline'}>

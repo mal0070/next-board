@@ -27,10 +27,10 @@ function BoardItem({ data, onDelete, onChange }: Props) {
     }
   };
 
- const handleBoardChange = (changedBoardData: BoardData) => {
+  const handleBoardChange = (changedBoardData: BoardData) => {
     setItem(changedBoardData); //UI
     onChange(changedBoardData); //부모 컴포넌트에 변경 알림
-  }
+  };
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const updatedData = { ...item, is_checked: e.target.checked };
@@ -54,18 +54,28 @@ function BoardItem({ data, onDelete, onChange }: Props) {
             className="w-[20px] h-[20px]"
             checked={item.is_checked}
             onChange={handleCheckboxChange}
-          /> 
+          />
           <label
             htmlFor={`todo-${item.id}`}
             className="scroll-m-20 text-2xl font-semibold tracking-tight m-3"
           >
-          {item.title}
+            {item.title}
           </label>
         </div>
         <div className="flex justify-between">
           <div className="flex items-center gap-6">
-            <DatePicker label="From" isReadOnly={true} value={item.from_date} onSetDate={handleDateChange('from_date')}/>
-            <DatePicker label="To" isReadOnly={true} value={item.to_date} onSetDate={handleDateChange('to_date')}/>
+            <DatePicker
+              label="From"
+              isReadOnly={true}
+              value={item.from_date}
+              onSetDate={handleDateChange('from_date')}
+            />
+            <DatePicker
+              label="To"
+              isReadOnly={true}
+              value={item.to_date}
+              onSetDate={handleDateChange('to_date')}
+            />
           </div>
           <div className="flex gap-3">
             <Button className="bg-transparent text-gray-500">Duplicate</Button>
@@ -77,15 +87,26 @@ function BoardItem({ data, onDelete, onChange }: Props) {
             </Button>
           </div>
         </div>
-      </div>
-      <div className="flex flex-col items-center gap-5">
         <hr className="w-full solid"></hr>
-        <MarkdownEditorDialog boardData={item} onChange={handleBoardChange}>
-          <Button variant={'ghost'} className="text-gray-500 bg-transparent">
-            Add Contents
-          </Button>
-        </MarkdownEditorDialog>
       </div>
+      {item.contents ? (
+        <div className="flex flex-col">
+          <div>{item.contents}</div>
+          <MarkdownEditorDialog boardData={item} onChange={handleBoardChange}>
+            <Button variant={'ghost'} className="text-gray-500 bg-transparent w-auto">
+              Edit Contents
+            </Button>
+          </MarkdownEditorDialog>
+        </div>
+      ) : (
+        <div className="flex flex-col items-center gap-5">
+          <MarkdownEditorDialog boardData={item} onChange={handleBoardChange}>
+            <Button variant={'ghost'} className="text-gray-500 bg-transparent">
+              Add Contents
+            </Button>
+          </MarkdownEditorDialog>
+        </div>
+      )}
     </div>
   );
 }
