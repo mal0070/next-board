@@ -76,15 +76,16 @@ function BoardPage() {
     setProgress(count);
   }
 
+
+
+  
+
   const createBoard = async () => {
     try {
       const { data, error } = await supabase
         .from('boards')
         .insert({
-          title: '제목없음',
-          from_date: new Date(),
-          to_date: new Date(),
-          contents: '',
+          title: '제목을 입력해주세요.',
           is_checked: false,
           todo_id: tid,
         })

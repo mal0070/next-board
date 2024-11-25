@@ -3,15 +3,47 @@ import { Button, SearchBar } from '@/components/ui';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useCreateTodo, useGetTodos } from '@/hooks/api/supabase';
+import { supabase } from '@/lib/supabase';
+import { useToast } from '@/hooks/use-toast';
 
 
 function AsidePage() {
   const router = useRouter();
   const createPage = useCreateTodo();
 
-  const { todos, getTodos } = useGetTodos();
+  const { todos, setTodos, getTodos } = useGetTodos();
+  const {toast} = useToast();
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
-  //const [todos, setTodos] = useState<Todo[]>([]);
+  const handleSearch = async(event: React.KeyboardEvent<HTMLInputElement>) => {
+    if(event.key === "Enter"){
+      try{
+        const { data, status, error} = await supabase.from("todos").select('*').ilike('title', `%${searchTerm}%`);
+        
+        if(data && status === 200){
+          setTodos(data);
+          toast({
+            title: '검색.',
+            description: '해당 검색어가 포함된 TODO를 호출했습니다.',
+          });
+        }
+
+        if(error){
+          toast({
+            variant: 'destructive',
+            title: '에러가 발생했습니다.',
+            description: `Supabase 오류: ${error.message || '알 수 없는 오류'}`,
+          });
+        }  
+      } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: '네트워크 오류',
+        description: '서버와 연결할 수 없습니다. 다시 시도해주세요.',
+      });
+      }
+    }
+  }
 
   useEffect(() => {
     getTodos();
@@ -19,7 +51,7 @@ function AsidePage() {
 
   return (
     <aside className="page__aside">
-      <SearchBar placeholder="검색어를 입력하세요" />
+      <SearchBar placeholder="검색어를 입력하세요" onChange={(event)=> setSearchTerm(event.target.value)} onKeyDown={handleSearch}/>
       <Button
         className="text-[#E79057] bg-white border border-[#E79057] hover:bg-[#ffb235]"
         onClick={createPage}

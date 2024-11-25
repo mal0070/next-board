@@ -34,6 +34,7 @@ function BoardItem({ data, onDelete, onChange }: Props) {
   };
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //데이터가 없으면, check 못하게 함
     const updatedData = { ...item, is_checked: e.target.checked };
     handleBoardChange(updatedData);
   };

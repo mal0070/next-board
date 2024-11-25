@@ -30,5 +30,5 @@ export function useGetTodos() {
     }
   };
 
-  return {todos, getTodos};
+  return {todos,setTodos, getTodos};
 }

@@ -13,7 +13,6 @@ import {
   DatePicker,
   DialogClose,
 } from '@/components/ui';
-import { supabase } from '@/lib/supabase';
 import MarkdownEditor from '@uiw/react-markdown-editor';
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
@@ -79,13 +78,13 @@ function MarkdownEditorDialog({ children, board, onChange }: Props) {
         <div className="flex items-center gap-5">
           <DatePicker
             label={'From'}
-            value={itemData.from_date}
+            value={itemData.from_date || undefined}
             onSetDate={(date: Date) => handleDataChange('from_date', date)}
             isReadOnly={false}
           />
           <DatePicker
             label={'To'}
-            value={itemData.to_date}
+            value={itemData.to_date || undefined}
             onSetDate={(date: Date) => handleDataChange('to_date', date)}
             isReadOnly={false}
           />
