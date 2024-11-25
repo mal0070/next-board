@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { Button, Progress, DatePicker } from '@/components/ui';
+import { Button, SearchBar, Progress, DatePicker } from '@/components/ui';
 import styles from './page.module.scss';
 import BoardItem from '../../../features/board/board-item';
 import { ArrowLeftSquareIcon, PlusCircleIcon } from 'lucide-react';
@@ -10,9 +10,6 @@ import { supabase } from '@/lib/supabase';
 import AsidePage from '@/features/aside/aside-page';
 import { useToast } from '@/hooks/use-toast';
 import { Board } from '@/types';
-import { useCreateBoard} from '@/hooks/api/supabase';
-import { useAtom } from 'jotai';
-import { boardAtom } from '@/stores/atom';
 
 function BoardPage() {
   const router = useRouter();
@@ -21,53 +18,26 @@ function BoardPage() {
   const params = useParams();
   const tid = params.id;
 
-  const [boards, setBoards] = useAtom(boardAtom);
+  const [boards, setBoards] = React.useState<Board[]>([]);
   const [todoTitle, setTodoTitle] = React.useState<string>('');
   const [todoStartDate, setTodoStartDate] = React.useState<Date>();
   const [todoEndDate, setTodoEndDate] = React.useState<Date>();
   const [progress, setProgress] = React.useState<number>(0);
 
   React.useEffect(() => {
-    getBoardsPage();
+    getBoards();
     getTodoTitleAndDate();
   }, [tid]);
 
   async function deleteTodo() {
     if (confirm('이 TODO 페이지를 삭제하시겠습니까?') === true) {
-      try {
-        const {data} = await supabase.from('boards').delete().eq('todo_id',tid);
-        const { error } = await supabase
-          .from('todos')
-          .delete()
-          .eq('id', tid)
-          .select();
-        
-        router.push('/');
-        toast({
-          variant: "default",
-          title: "해당 TODO 삭제를 완료했습니다.",
-          description: "새로운 TODO가 생기면 언제든 추가해주세요!"
-        })
-
-        if (error) {
-          toast({
-            variant: 'destructive',
-            title: '에러가 발생했습니다.',
-            description: `Supabase 오류: ${error.message || '알 수 없는 오류'}`,
-          });
-        }
-      } catch (error) {
-        console.error(error);
-        toast({
-          variant: 'destructive',
-          title: '네트워크 오류',
-          description: '서버와 연결할 수 없습니다. 다시 시도해주세요.',
-        });
-      }
+      const { data } = await supabase.from('todos').delete().eq('id', tid);
+      router.push('/');
     }
+    return;
   }
 
-async function getBoardsPage() {
+  async function getBoards() {
     const { data } = await supabase.from('boards').select().eq('todo_id', tid);
     setBoards(data || []);
 
@@ -76,22 +46,40 @@ async function getBoardsPage() {
     setProgress(count);
   }
 
-  const createBoard =() => {
-    useCreateBoard(Number(tid));
-    getBoardsPage();
-  }
+  const createBoard = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('boards')
+        .insert({
+          title: '제목없음',
+          from_date: new Date(),
+          to_date: new Date(),
+          contents: '',
+          is_checked: false,
+          todo_id: tid,
+        })
+        .select();
+
+      if (data) {
+        console.log(data);
+        getBoards();
+      }
+    } catch (error) {
+      console.error('board insert 오류: ' + error);
+    }
+  };
 
   const handleBoardChange = React.useCallback((changedBoardData: Board) => {
-    setBoards((prevBoards) =>
-      prevBoards.map((board) =>
-        board.id === changedBoardData.id ? changedBoardData : board
+    setBoards((prevItems) =>
+      prevItems.map((item) =>
+        item.id === changedBoardData.id ? changedBoardData : item
       )
     );
   }, []);
 
   const updateBoardChange = async () => {
     try {
-      const board = boards.find((board) => board.todo_id === Number(tid));
+      const board = boards.find((item) => item.todo_id === Number(tid));
       if (!board) return;
 
       const { error } = await supabase
@@ -107,14 +95,13 @@ async function getBoardsPage() {
 
   const handleDelete = (id: number) => {
     //UI업데이트
-    setBoards((prevItem) => prevItem.filter((board) => board.id !== id));
+    setBoards((prevItem) => prevItem.filter((item) => item.id !== id));
     toast({
       title: '선택하신 TODO-BOARD가 삭제되었습니다.',
       description:
         "새로운 TODO-BOARD를 생성하려면 'Add New Board' 버튼을 눌러주세요!",
     });
   };
-
 
   async function getTodoTitleAndDate() {
     const { data } = await supabase
@@ -159,7 +146,7 @@ async function getBoardsPage() {
     }
   };
 
-  const onSave = async () => {
+  const saveChange = async () => {
     if (!todoTitle || !todoStartDate || !todoEndDate) {
       toast({
         variant: 'destructive',
@@ -187,7 +174,7 @@ async function getBoardsPage() {
                 <ArrowLeftSquareIcon />
               </Button>
               <div className="flex gap-2">
-                <Button className="w-12 h-10 " onClick={onSave}>
+                <Button className="w-12 h-10 " onClick={saveChange}>
                   저장
                 </Button>
                 <Button className="w-12 h-10" onClick={deleteTodo}>
@@ -241,10 +228,10 @@ async function getBoardsPage() {
         </div>
         <div className={styles.area}>
           {boards.length > 0 ? (
-            boards.map((board) => (
+            boards.map((item) => (
               <BoardItem
-                key={board.id}
-                data={board}
+                key={item.id}
+                data={item}
                 onDelete={handleDelete}
                 onChange={handleBoardChange}
               />
@@ -254,10 +241,7 @@ async function getBoardsPage() {
               <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
                 There is no board yet.
               </h3>
-              <PlusCircleIcon
-                className="w-14 h-14"
-                onClick={createBoard}
-              ></PlusCircleIcon>
+              <PlusCircleIcon className='w-14 h-14' onClick={createBoard}></PlusCircleIcon>
             </div>
           )}
         </div>
