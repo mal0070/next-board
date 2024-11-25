@@ -10,7 +10,9 @@ import { supabase } from '@/lib/supabase';
 import AsidePage from '@/features/aside/aside-page';
 import { useToast } from '@/hooks/use-toast';
 import { Board } from '@/types';
-import { useCreateBoard, useGetBoards } from '@/hooks/api/supabase';
+import { useCreateBoard} from '@/hooks/api/supabase';
+import { useAtom } from 'jotai';
+import { boardAtom } from '@/stores/atom';
 
 function BoardPage() {
   const router = useRouter();
@@ -19,9 +21,7 @@ function BoardPage() {
   const params = useParams();
   const tid = params.id;
 
-  //const { boards, getBoards} = useGetBoards(Number(tid));
-
-  const [items, setItems] = React.useState<Board[]>([]);
+  const [boards, setBoards] = useAtom(boardAtom);
   const [todoTitle, setTodoTitle] = React.useState<string>('');
   const [todoStartDate, setTodoStartDate] = React.useState<Date>();
   const [todoEndDate, setTodoEndDate] = React.useState<Date>();
@@ -67,17 +67,9 @@ function BoardPage() {
     }
   }
 
-  /*const getBoardsPage = () => {
-    getBoards();
-
-    let count = 0;
-    boards?.forEach((i) => (i.is_checked ? count++ : 0));
-    setProgress(count);
-  }*/
-
 async function getBoardsPage() {
     const { data } = await supabase.from('boards').select().eq('todo_id', tid);
-    setItems(data || []);
+    setBoards(data || []);
 
     let count = 0;
     data?.forEach((i) => (i.is_checked ? count++ : 0));
@@ -90,16 +82,16 @@ async function getBoardsPage() {
   }
 
   const handleBoardChange = React.useCallback((changedBoardData: Board) => {
-    setItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === changedBoardData.id ? changedBoardData : item
+    setBoards((prevBoards) =>
+      prevBoards.map((board) =>
+        board.id === changedBoardData.id ? changedBoardData : board
       )
     );
   }, []);
 
   const updateBoardChange = async () => {
     try {
-      const board = items.find((item) => item.todo_id === Number(tid));
+      const board = boards.find((board) => board.todo_id === Number(tid));
       if (!board) return;
 
       const { error } = await supabase
@@ -115,7 +107,7 @@ async function getBoardsPage() {
 
   const handleDelete = (id: number) => {
     //UI업데이트
-    setItems((prevItem) => prevItem.filter((item) => item.id !== id));
+    setBoards((prevItem) => prevItem.filter((board) => board.id !== id));
     toast({
       title: '선택하신 TODO-BOARD가 삭제되었습니다.',
       description:
@@ -210,19 +202,19 @@ async function getBoardsPage() {
               value={todoTitle}
               onChange={handleTodoTitleChange}
             ></input>
-            <div className="flex items-center justify-start gap-4">
+            <div className="flex boards-center justify-start gap-4">
               <small className="text-sm font-medium leading-none text-[#A6A6A6] mx-0">
-                {progress}/{items.length} Completed
+                {progress}/{boards.length} Completed
               </small>
               <Progress
                 className="w-60 h-[10px]"
                 value={progress}
-                max={items.length}
+                max={boards.length}
               ></Progress>
             </div>
           </div>
           <div className={styles.header__bottom}>
-            <div className="flex items-center gap-3">
+            <div className="flex boards-center gap-3">
               <DatePicker
                 label="From"
                 isReadOnly={false}
@@ -248,17 +240,17 @@ async function getBoardsPage() {
           </div>
         </div>
         <div className={styles.area}>
-          {items.length > 0 ? (
-            items.map((item) => (
+          {boards.length > 0 ? (
+            boards.map((board) => (
               <BoardItem
-                key={item.id}
-                data={item}
+                key={board.id}
+                data={board}
                 onDelete={handleDelete}
                 onChange={handleBoardChange}
               />
             ))
           ) : (
-            <div className="flex flex-col items-center gap-4">
+            <div className="flex flex-col boards-center gap-4">
               <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
                 There is no board yet.
               </h3>
