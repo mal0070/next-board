@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { Button, SearchBar, Progress, DatePicker } from '@/components/ui';
+import { Button, Progress, DatePicker } from '@/components/ui';
 import styles from './page.module.scss';
 import BoardItem from '../../../features/board/board-item';
 import { ArrowLeftSquareIcon, PlusCircleIcon } from 'lucide-react';
@@ -31,10 +31,40 @@ function BoardPage() {
 
   async function deleteTodo() {
     if (confirm('이 TODO 페이지를 삭제하시겠습니까?') === true) {
-      const { data } = await supabase.from('todos').delete().eq('id', tid);
-      router.push('/');
+      try {
+        const { data } = await supabase
+          .from('boards')
+          .delete()
+          .eq('todo_id', tid);
+        const { error } = await supabase
+          .from('todos')
+          .delete()
+          .eq('id', tid)
+          .select();
+
+        router.push('/');
+        toast({
+          variant: 'default',
+          title: '해당 TODO 삭제를 완료했습니다.',
+          description: '새로운 TODO가 생기면 언제든 추가해주세요!',
+        });
+
+        if (error) {
+          toast({
+            variant: 'destructive',
+            title: '에러가 발생했습니다.',
+            description: `Supabase 오류: ${error.message || '알 수 없는 오류'}`,
+          });
+        }
+      } catch (error) {
+        console.error(error);
+        toast({
+          variant: 'destructive',
+          title: '네트워크 오류',
+          description: '서버와 연결할 수 없습니다. 다시 시도해주세요.',
+        });
+      }
     }
-    return;
   }
 
   async function getBoards() {
@@ -61,11 +91,25 @@ function BoardPage() {
         .select();
 
       if (data) {
-        console.log(data);
-        getBoards();
+        setBoards(prevBoards => [...prevBoards, ...data]);
+        toast({
+          title: '새로운 TODO-BOARD를 생성했습니다.',
+          description: '생성한 BOARD를 예쁘게 꾸며주세요!',
+        });
+      }
+      if (error) {
+        toast({
+          variant: 'destructive',
+          title: '에러가 발생했습니다.',
+          description: `Supabase 오류: ${error.message || '알 수 없는 오류'}`,
+        });
       }
     } catch (error) {
-      console.error('board insert 오류: ' + error);
+      toast({
+        variant: 'destructive',
+        title: '네트워크 오류',
+        description: '서버와 연결할 수 없습니다. 다시 시도해주세요.',
+      });
     }
   };
 
@@ -82,14 +126,33 @@ function BoardPage() {
       const board = boards.find((item) => item.todo_id === Number(tid));
       if (!board) return;
 
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('boards')
         .update(board)
         .eq('id', board.id);
-      if (error) throw error;
-      console.log('update board!');
+
+      if (data) {
+        setBoards(data);
+        toast({
+          title: '보드가 업데이트되었습니다.',
+          description: '변경사항이 성공적으로 저장되었습니다.',
+        });
+      }
+
+      if (error) {
+        toast({
+          variant: 'destructive',
+          title: '에러가 발생했습니다.',
+          description: `Supabase 오류: ${error.message || '알 수 없는 오류'}`,
+        });
+      }
+
     } catch (error) {
-      console.error('updating board error: ' + error);
+      toast({
+        variant: 'destructive',
+        title: '네트워크 오류',
+        description: '서버와 연결할 수 없습니다. 다시 시도해주세요.',
+      });
     }
   };
 
@@ -170,14 +233,12 @@ function BoardPage() {
         <div className={styles.header}>
           <div className={styles.header__top}>
             <div className="flex justify-between">
-              <Button className="w-5 h-10 bg-slate-300" onClick={backHome}>
-                <ArrowLeftSquareIcon />
-              </Button>
+                <ArrowLeftSquareIcon className="w-10 h-10" onClick={backHome}/>
               <div className="flex gap-2">
-                <Button className="w-12 h-10 " onClick={saveChange}>
+                <Button className="w-14 h-10 " onClick={saveChange}>
                   저장
                 </Button>
-                <Button className="w-12 h-10" onClick={deleteTodo}>
+                <Button className="w-14 h-10 bg-red-400 text-red-800" onClick={deleteTodo}>
                   삭제
                 </Button>
               </div>
@@ -241,7 +302,10 @@ function BoardPage() {
               <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
                 There is no board yet.
               </h3>
-              <PlusCircleIcon className='w-14 h-14' onClick={createBoard}></PlusCircleIcon>
+              <PlusCircleIcon
+                className="w-14 h-14"
+                onClick={createBoard}
+              ></PlusCircleIcon>
             </div>
           )}
         </div>

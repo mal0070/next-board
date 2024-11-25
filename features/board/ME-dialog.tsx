@@ -29,10 +29,10 @@ function MarkdownEditorDialog({ children, board, onChange }: Props) {
   const { toast } = useToast();
 
   useEffect(() => {
-    getBoardData();
+    setItemData(board);
   }, []);
 
-  const getBoardData = async () => {
+  /*const getBoardData = async () => {
     const { data } = await supabase
       .from('boards')
       .select()
@@ -40,7 +40,7 @@ function MarkdownEditorDialog({ children, board, onChange }: Props) {
       .single();
     
     if (data) setItemData(data);
-  };
+  };*/
 
 /* const handleDataChange = (field: keyof BoardData, value:any) => {
     setItemData((prevData)=> ({...prevData, [field]:value}));

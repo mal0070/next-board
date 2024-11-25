@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { MarkdownEditorDialog } from './ME-dialog';
 import { Board } from '@/types';
 import { supabase } from '@/lib/supabase';
-import { useToast } from '@/hooks/use-toast';
 
 interface Props {
   data: Board;
@@ -13,7 +12,6 @@ interface Props {
 
 function BoardItem({ data, onDelete, onChange }: Props) {
   const [item, setItem] = useState<Board>(data);
-  const { toast } = useToast();
 
   useEffect(() => {
     setItem(data);
