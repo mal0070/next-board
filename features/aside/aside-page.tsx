@@ -1,50 +1,22 @@
 import React from 'react';
 import { Button, SearchBar } from '@/components/ui';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
+import { useCreateTodo, useGetTodos } from '@/hooks/api/supabase';
 
-interface Todo {
-  id: number;
-  title: string;
-  from_date: Date;
-  to_date: Date;
-  boards_id: number;
-}
 
 function AsidePage() {
   const router = useRouter();
-  
-  const createPage = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('todos')
-        .insert({
-          title: '제목을 입력하세요.',
-          from_date: null,
-          to_date: null,
-        })
-        .select();
+  const createPage = useCreateTodo();
 
-      if (data) {
-        router.push(`/board/${data[0].id}`);
-        console.log(data);
-      }
-    } catch (error) {
-      console.error('todo insert 오류: ' + error);
-    }
-  };
+  const { todos, getTodos } = useGetTodos();
 
-  const [todos, setTodos] = useState<Todo[]>([]);
+  //const [todos, setTodos] = useState<Todo[]>([]);
 
   useEffect(() => {
     getTodos();
   }, []);
 
-  async function getTodos() {
-    const { data } = await supabase.from('todos').select();
-    setTodos(data || []); // 데이터가 null일 경우 빈 배열로 설정
-  }
   return (
     <aside className="page__aside">
       <SearchBar placeholder="검색어를 입력하세요" />
@@ -68,7 +40,7 @@ function AsidePage() {
                 onClick={() => router.push(`/board/${todo.id}`)}
               >
                 <div className="h-[10px] w-[10px] bg-[#00f38d]"></div>
-                <p>{todo.title}</p>
+                <p>{todo.title ? todo.title : '제목을 입력해주세요.'}</p>
               </li>
             ))
           ) : (

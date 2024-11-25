@@ -1,18 +1,18 @@
 import { DatePicker, Button } from '@/components/ui';
 import React, { useEffect, useState } from 'react';
 import { MarkdownEditorDialog } from './ME-dialog';
-import { BoardData } from '@/app/board/[id]/page';
+import { Board } from '@/types';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
 
 interface Props {
-  data: BoardData;
+  data: Board;
   onDelete: (id: number) => void; //부모 컴포넌트에서 상태 업데이트
-  onChange: (changedBoardData: BoardData) => void;
+  onChange: (changedBoardData: Board) => void;
 }
 
 function BoardItem({ data, onDelete, onChange }: Props) {
-  const [item, setItem] = useState<BoardData>(data);
+  const [item, setItem] = useState<Board>(data);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -29,7 +29,7 @@ function BoardItem({ data, onDelete, onChange }: Props) {
     }
   };
 
-  const handleBoardChange = (changedBoardData: BoardData) => {
+  const handleBoardChange = (changedBoardData: Board) => {
     setItem(changedBoardData); //UI
     onChange(changedBoardData); //부모 컴포넌트에 변경 알림
 
@@ -95,7 +95,7 @@ function BoardItem({ data, onDelete, onChange }: Props) {
       {item.contents ? (
         <div className="flex flex-col">
           <div>{item.contents}</div>
-          <MarkdownEditorDialog boardData={item} onChange={handleBoardChange}>
+          <MarkdownEditorDialog board={item} onChange={handleBoardChange}>
             <Button
               variant={'ghost'}
               className="text-gray-500 bg-transparent w-auto"
@@ -106,7 +106,7 @@ function BoardItem({ data, onDelete, onChange }: Props) {
         </div>
       ) : (
         <div className="flex flex-col items-center gap-5">
-          <MarkdownEditorDialog boardData={item} onChange={handleBoardChange}>
+          <MarkdownEditorDialog board={item} onChange={handleBoardChange}>
             <Button variant={'ghost'} className="text-gray-500 bg-transparent">
               Add Contents
             </Button>

@@ -2,58 +2,17 @@
 
 import AsidePage from "@/features/aside/aside-page";
 
-
+import { Todo } from "@/types";
 import { Button } from '@/components/ui';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
-import { BoardData } from './board/[id]/page';
-import { nanoid } from "nanoid"; // ESM
-//import { useToast } from '@/hooks/use-toast';
+import { useCreateTodo } from "@/hooks/api/supabase";
 
-interface Todo {
-  id: number;
-  title: string;
-  from_date: Date;
-  to_date: Date;
-  boards_id: number;
-}
 
 function Home() {
   
-  const router = useRouter();
-  // const {toast}  = useToast();
-
-  const createPage = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('todos')
-        .insert({
-          title: null,
-          from_date: null,
-          to_date: null,
-        })
-        .select();
-
-      if (data) {
-        router.push(`/board/${data[0].id}`);
-        console.log(data);
-      }
-    } catch (error) {
-      console.error('todo insert 오류: ' + error);
-    }
-  };
-
-  const [todos, setTodos] = useState<Todo[]>([]);
-
-  useEffect(() => {
-    getTodos();
-  }, []);
-
-  async function getTodos() {
-    const { data } = await supabase.from('todos').select();
-    setTodos(data || []); // 데이터가 null일 경우 빈 배열로 설정
-  }
+  const createPage = useCreateTodo();
 
   return (
     <div className="page">

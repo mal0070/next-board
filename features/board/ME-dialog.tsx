@@ -1,6 +1,6 @@
 'use client';
 
-import { BoardData } from '@/app/board/[id]/page';
+import { Board } from '@/types';
 import {
   Button,
   Dialog,
@@ -20,12 +20,12 @@ import { useToast } from '@/hooks/use-toast';
 
 interface Props {
   children: React.ReactNode;
-  boardData: BoardData;
-  onChange: (changedBoardData:BoardData) => void;
+  board: Board;
+  onChange: (changedBoardData:Board) => void;
 }
 
-function MarkdownEditorDialog({ children, boardData, onChange }: Props) {
-  const [itemData, setItemData] = useState<BoardData>(boardData);
+function MarkdownEditorDialog({ children, board, onChange }: Props) {
+  const [itemData, setItemData] = useState<Board>(board);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -36,7 +36,7 @@ function MarkdownEditorDialog({ children, boardData, onChange }: Props) {
     const { data } = await supabase
       .from('boards')
       .select()
-      .eq('id', boardData.id)
+      .eq('id', board.id)
       .single();
     
     if (data) setItemData(data);
@@ -47,7 +47,7 @@ function MarkdownEditorDialog({ children, boardData, onChange }: Props) {
   } //각 필드 별로 set할 수 있도록 설정*/
 
   
-  const handleDataChange = (field: keyof BoardData, value: any) => {
+  const handleDataChange = (field: keyof Board, value: any) => {
     setItemData((prevData) => {
       const newData = {...prevData, [field]: value};
       console.log('Updated itemData:', newData);
