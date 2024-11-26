@@ -9,62 +9,57 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { toast } from '@/hooks/use-toast';
+//import { supabase } from '@/lib/supabase';
 import { createClient } from '@/lib/client';
-import { userAtom } from '@/stores/atom';
-import { useAtom } from 'jotai';
-
 import { Eye } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-
 import React, { useState } from 'react';
+//import axios from 'axios';
 
-function LoginPage() {
-  const supabase = createClient();
+
+function SignupPage() {
   const router = useRouter();
+  const supabase = createClient();
 
-  const [user, setUser] = useAtom(userAtom);
-  const [emailInput, setEmailInput] = useState('');
-  const [passwordInput, setPasswordInput] = useState('');
+  const [nameInput, setNameInput] = useState('');
+  const [emailInput, setEmailInput] = useState("");
+  const [passwordInput, setPasswordInput] = useState("");
 
-  const signIn = async () => {
+  const saveUserEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmailInput(e.target.value);
+  }
+
+  const saveUserPassword = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPasswordInput(e.target.value);
+  }
+
+  //DB저장
+  const handleSignup = async () => {
     try {
-      const { data:{user}, error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signUp({
         email: emailInput,
         password: passwordInput,
       });
 
-      if (user) {
-        console.log(user);
-        setUser({
-          name: user.id || 'mina',
-          email: user.email || '',
-          avatar: 'public/assets/profile.jpg',
-        });
-        toast({
-          title: '로그인을 성공하였습니다.',
-          description: '자유롭게 TASK 관리를 해주세요!',
-        });
-        router.push('/board'); // 로그인 페이지로 이동
+      if (passwordInput.length < 6) {
+        alert('비밀번호는 6자리 이상이여야합니다.');
+      } 
+      //email 중복확인 기능 추후 추가
+      else {
+        /*sessionStorage.setItem('user_email', emailInput);
+        sessionStorage.setItem('user_password', passwordInput);*/
+        router.push('/board');
       }
-      if (error) {
-        toast({
-          variant: 'destructive',
-          title: '에러가 발생했습니다.',
-          description: `Supabase 오류: ${error.message || '알 수 없는 오류'}`,
-        });
-      }
+
+      if (error) console.error(error);
+
+
     } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: '네트워크 오류',
-        description: '서버와 연결할 수 없습니다. 다시 시도해주세요!',
-      });
+      console.error('네트워크 오류: ' + error);
     }
   };
 
-  //supabase 로그인
   return (
     <div className="page">
       <div className="page__container">
@@ -78,45 +73,45 @@ function LoginPage() {
               에 방문해주셔서 감사합니다.
             </div>
             <p className="text-sm text-muted-foreground">
-              서비스를 이용하려면 로그인을 진행해주세요.
+              회원가입을 진행해주세요.
             </p>
           </div>
         </div>
         <Card className="w-[400px]">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl">로그인</CardTitle>
+            <CardTitle className="text-2xl">회원가입</CardTitle>
             <CardDescription>
-              로그인을 위한 정보를 입력해주세요.
+              계정을 생성하기 위해 아래 정보를 입력해주세요.
             </CardDescription>
           </CardHeader>
-          <CardContent className="grid gap-6">
+          <CardContent className="grid gap-6" id="login-form">
+          <div className="grid gap-2">
+              <label htmlFor="email">이름</label>
+              <input
+                id="name"
+                type='id'
+                placeholder="이름을 입력하세요."
+                onChange={(e) => setNameInput(e.target.value)}
+                required
+              />
+            </div>
             <div className="grid gap-2">
               <label htmlFor="email">이메일</label>
               <input
                 id="email"
                 type="email"
                 placeholder="이메일을 입력하세요."
-                value={emailInput}
-                onChange={(event) => setEmailInput(event.target.value)}
+                onChange={(e) => saveUserEmail(e)}
                 required
               />
             </div>
             <div className="relative grid gap-2">
-              <div className="flex items-center">
-                <label htmlFor="password">비밀번호</label>
-                <Link
-                  href={'#'}
-                  className="ml-auto inline-block text-sm underline"
-                >
-                  비밀번호를 잊으셨나요?
-                </Link>
-              </div>
+              <label htmlFor="password">비밀번호</label>
               <input
                 id="password"
                 type="password"
                 placeholder="비밀번호를 입력하세요."
-                value={passwordInput}
-                onChange={(event) => setPasswordInput(event.target.value)}
+                onChange={(e) => saveUserPassword(e)}
                 required
               />
               <Button
@@ -133,21 +128,29 @@ function LoginPage() {
             </div>
             <div className="relative flex justify-center text-xs uppercase">
               <span className="bg-background px-2 text-muted-foreground">
-                Or continue with
+                간편 회원가입을 원하시면 이전 버튼을 누르세요.
               </span>
             </div>
           </div>
           <CardFooter className="flex flex-col mt-6">
-            <Button
-              className="text-[#E79057] bg-transparent border border-[#E79057] hover:bg-[#ffb235] w-full"
-              onClick={signIn}
-            >
-              로그인
-            </Button>
-            <div className="mt-4 text-center text-sm">
-              계정이 없으신가요?
-              <Link href={'/signup'} className="underline text-sm ml-1">
+            <div className="w-full flex items-center gap-4">
+              <Button
+                variant={'outline'}
+                className="w-full"
+                onClick={() => router.push('/')}
+              >
+                이전
+              </Button>
+              <Button className="w-full text-white bg-[#E79057] hover:bg-[#E26F24] hover:ring-1 hover:ring-[#E26F24] hover:ring-offset-1 active:bg-[#D5753D] hover:shadow-lg"
+              type='submit'
+              onClick={handleSignup}>
                 회원가입
+              </Button>
+            </div>
+            <div className="mt-4 text-center text-sm">
+              이미 계정이 있으신가요?{' '}
+              <Link href={'/'} className="underline text-sm ml-1">
+                로그인
               </Link>
             </div>
           </CardFooter>
@@ -157,4 +160,4 @@ function LoginPage() {
   );
 }
 
-export default LoginPage;
+export default SignupPage;

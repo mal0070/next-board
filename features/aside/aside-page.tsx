@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { Button, SearchBar } from '@/components/ui';
 import { useRouter } from 'next/navigation';
@@ -5,22 +7,36 @@ import { useEffect, useState } from 'react';
 import { useCreateTodo, useGetTodos } from '@/hooks/api/supabase';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
-
+import { NavUser } from './nav-user';
+import { useAtomValue } from 'jotai';
+import { userAtom } from '@/stores/atom';
 
 function AsidePage() {
+  /*const fetchUserData = async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if(user) return user.app_metadata;
+  };*/
+
+  const user = useAtomValue(userAtom); //read
+
   const router = useRouter();
   const createPage = useCreateTodo();
 
   const { todos, setTodos, getTodos } = useGetTodos();
-  const {toast} = useToast();
-  const [searchTerm, setSearchTerm] = useState<string>("");
+  const { toast } = useToast();
+  const [searchTerm, setSearchTerm] = useState<string>('');
 
-  const handleSearch = async(event: React.KeyboardEvent<HTMLInputElement>) => {
-    if(event.key === "Enter"){
-      try{
-        const { data, status, error} = await supabase.from("todos").select('*').ilike('title', `%${searchTerm}%`);
-        
-        if(data && status === 200){
+  const handleSearch = async (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      try {
+        const { data, status, error } = await supabase
+          .from('todos')
+          .select('*')
+          .ilike('title', `%${searchTerm}%`);
+
+        if (data && status === 200) {
           setTodos(data);
           toast({
             title: '검색.',
@@ -28,22 +44,22 @@ function AsidePage() {
           });
         }
 
-        if(error){
+        if (error) {
           toast({
             variant: 'destructive',
             title: '에러가 발생했습니다.',
             description: `Supabase 오류: ${error.message || '알 수 없는 오류'}`,
           });
-        }  
+        }
       } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: '네트워크 오류',
-        description: '서버와 연결할 수 없습니다. 다시 시도해주세요.',
-      });
+        toast({
+          variant: 'destructive',
+          title: '네트워크 오류',
+          description: '서버와 연결할 수 없습니다. 다시 시도해주세요.',
+        });
       }
     }
-  }
+  };
 
   useEffect(() => {
     getTodos();
@@ -51,7 +67,11 @@ function AsidePage() {
 
   return (
     <aside className="page__aside">
-      <SearchBar placeholder="검색어를 입력하세요" onChange={(event)=> setSearchTerm(event.target.value)} onKeyDown={handleSearch}/>
+      <SearchBar
+        placeholder="검색어를 입력하세요"
+        onChange={(event) => setSearchTerm(event.target.value)}
+        onKeyDown={handleSearch}
+      />
       <Button
         className="text-[#E79057] bg-white border border-[#E79057] hover:bg-[#ffb235]"
         onClick={createPage}
@@ -80,8 +100,9 @@ function AsidePage() {
           )}
         </ul>
       </div>
+      <NavUser user={user}/>
     </aside>
   );
 }
 
-export default AsidePage;
+export { AsidePage };

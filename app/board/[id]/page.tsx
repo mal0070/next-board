@@ -76,23 +76,22 @@ function BoardPage() {
     setProgress(count);
   }
 
-
-
-  
-
   const createBoard = async () => {
     try {
       const { data, error } = await supabase
         .from('boards')
         .insert({
           title: '제목을 입력해주세요.',
+          from_date: undefined,
+          to_date: undefined,
+          contents: '',
           is_checked: false,
           todo_id: tid,
         })
         .select();
 
       if (data) {
-        setBoards(prevBoards => [...prevBoards, ...data]);
+        setBoards((prevBoards) => [...prevBoards, ...data]);
         toast({
           title: '새로운 TODO-BOARD를 생성했습니다.',
           description: '생성한 BOARD를 예쁘게 꾸며주세요!',
@@ -122,23 +121,17 @@ function BoardPage() {
     );
   }, []);
 
+  //왜 이게 되다가 안될까?..
   const updateBoardChange = async () => {
     try {
       const board = boards.find((item) => item.todo_id === Number(tid));
       if (!board) return;
 
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('boards')
         .update(board)
         .eq('id', board.id);
 
-      if (data) {
-        setBoards(data);
-        toast({
-          title: '보드가 업데이트되었습니다.',
-          description: '변경사항이 성공적으로 저장되었습니다.',
-        });
-      }
 
       if (error) {
         toast({
@@ -147,7 +140,6 @@ function BoardPage() {
           description: `Supabase 오류: ${error.message || '알 수 없는 오류'}`,
         });
       }
-
     } catch (error) {
       toast({
         variant: 'destructive',
@@ -234,12 +226,15 @@ function BoardPage() {
         <div className={styles.header}>
           <div className={styles.header__top}>
             <div className="flex justify-between">
-                <ArrowLeftSquareIcon className="w-10 h-10" onClick={backHome}/>
+              <ArrowLeftSquareIcon className="w-10 h-10" onClick={backHome} />
               <div className="flex gap-2">
                 <Button className="w-14 h-10 " onClick={saveChange}>
                   저장
                 </Button>
-                <Button className="w-14 h-10 bg-red-400 text-red-800" onClick={deleteTodo}>
+                <Button
+                  className="w-14 h-10 bg-red-400 text-red-800"
+                  onClick={deleteTodo}
+                >
                   삭제
                 </Button>
               </div>
@@ -290,10 +285,10 @@ function BoardPage() {
         </div>
         <div className={styles.area}>
           {boards.length > 0 ? (
-            boards.map((item) => (
+            boards.map((board) => (
               <BoardItem
-                key={item.id}
-                data={item}
+                key={board.id}
+                data={board}
                 onDelete={handleDelete}
                 onChange={handleBoardChange}
               />
