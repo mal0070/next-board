@@ -38,7 +38,7 @@ function LoginPage() {
         setUser({
           name: user.id || 'mina',
           email: user.email || '',
-          avatar: '../public/assets/profile.jpg', //경로 오류남
+          avatar: '/assets/profile.jpg', //public이면 최상단으로 접근함
         });
         toast({
           title: '로그인을 성공하였습니다.',
@@ -46,6 +46,7 @@ function LoginPage() {
         });
         router.push('/board'); // 로그인 페이지로 이동
       }
+
       if (error) {
         toast({
           variant: 'destructive',

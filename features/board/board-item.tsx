@@ -10,7 +10,7 @@ interface Props {
   onChange: (changedBoardData: Board) => void;
 }
 
-function BoardItem({ data, onDelete, onChange }: Props) {
+function BoardItem({ data, onDelete,onChange}: Props) {
   const [item, setItem] = useState<Board>(data);
 
   useEffect(() => {
@@ -36,12 +36,14 @@ function BoardItem({ data, onDelete, onChange }: Props) {
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     //데이터가 없으면, check 못하게 함
     const updatedData = { ...item, is_checked: e.target.checked };
+    setItem(updatedData);
     handleBoardChange(updatedData);
   };
 
   const handleDateChange = (field: 'from_date' | 'to_date') => (date: Date) => {
     const updatedData = { ...item, [field]: date };
-    handleBoardChange(updatedData);
+    setItem(updatedData);
+   handleBoardChange(updatedData);
   };
 
   return (

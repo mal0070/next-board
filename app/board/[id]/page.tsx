@@ -7,7 +7,6 @@ import styles from './page.module.scss';
 import BoardItem from '../../../features/board/board-item';
 import { ArrowLeftSquareIcon, PlusCircleIcon } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-import {AsidePage} from '@/features/aside/aside-page';
 import { useToast } from '@/hooks/use-toast';
 import { Board } from '@/types';
 
@@ -113,25 +112,18 @@ function BoardPage() {
     }
   };
 
-  const handleBoardChange = React.useCallback((changedBoardData: Board) => {
+  const handleBoardChange = React.useCallback(async (changedBoardData: Board) => {
     setBoards((prevItems) =>
       prevItems.map((item) =>
         item.id === changedBoardData.id ? changedBoardData : item
       )
     );
-  }, []);
 
-  //왜 이게 되다가 안될까?..
-  const updateBoardChange = async () => {
     try {
-      const board = boards.find((item) => item.todo_id === Number(tid));
-      if (!board) return;
-
       const { error } = await supabase
         .from('boards')
-        .update(board)
-        .eq('id', board.id);
-
+        .update(changedBoardData)
+        .eq('id', changedBoardData.id);
 
       if (error) {
         toast({
@@ -147,7 +139,14 @@ function BoardPage() {
         description: '서버와 연결할 수 없습니다. 다시 시도해주세요.',
       });
     }
-  };
+  }, []);
+
+
+  const updateBoardChange = async () => {
+    const { error } = await supabase
+    .from('boards')
+    .upsert(boards);
+  } //데이터베이스에 모든 보드의 항목을 업데이트
 
   const handleDelete = (id: number) => {
     //UI업데이트
@@ -211,8 +210,21 @@ function BoardPage() {
       });
       return;
     }
-    await updateTodoTitleAndDate();
-    await updateBoardChange();
+    try {
+      await updateTodoTitleAndDate();
+      await updateBoardChange();
+      toast({
+        title: '변경사항이 성공적으로 저장되었습니다.',
+        description: '모든 데이터가 업데이트되었습니다.',
+      });
+    } catch (error) {
+      console.error('Error saving changes:', error);
+      toast({
+        variant: 'destructive',
+        title: '저장 중 오류가 발생했습니다.',
+        description: '다시 시도해주세요.',
+      });
+    }
   };
 
   const backHome = () => {
@@ -221,7 +233,6 @@ function BoardPage() {
 
   return (
     <div className="page">
-      <AsidePage />
       <main className="page__main">
         <div className={styles.header}>
           <div className={styles.header__top}>
@@ -290,7 +301,7 @@ function BoardPage() {
                 key={board.id}
                 data={board}
                 onDelete={handleDelete}
-                onChange={handleBoardChange}
+               onChange={handleBoardChange}
               />
             ))
           ) : (
