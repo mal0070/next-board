@@ -22,11 +22,33 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/client';
+import { toast } from '@/hooks/use-toast';
 
 interface Props {
   user: User | undefined;
 }
 export function NavUser({ user }: Props) {
+  const router = useRouter();
+  const supabase = createClient();
+  
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    router.push("/");
+    toast({
+        title: "로그아웃을 완료하였습니다.",
+        description: "TASK 관리 앱을 사용해주셔서 감사합니다.",
+    });
+    if (error) {
+        toast({
+            variant: "destructive",
+            title: "에러가 발생했습니다.",
+            description: `Supabase 오류: ${error.message || "알 수 없는 오류"}`,
+        });
+    }
+};
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -86,7 +108,7 @@ export function NavUser({ user }: Props) {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={handleLogout}>
           <LogOut />
           Log out
         </DropdownMenuItem>

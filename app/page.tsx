@@ -13,11 +13,9 @@ import { toast } from '@/hooks/use-toast';
 import { createClient } from '@/lib/client';
 import { userAtom } from '@/stores/atom';
 import { useAtom } from 'jotai';
-
 import { Eye } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-
 import React, { useState } from 'react';
 
 function LoginPage() {
@@ -40,7 +38,7 @@ function LoginPage() {
         setUser({
           name: user.id || 'mina',
           email: user.email || '',
-          avatar: 'public/assets/profile.jpg',
+          avatar: '../public/assets/profile.jpg', //경로 오류남
         });
         toast({
           title: '로그인을 성공하였습니다.',

@@ -7,7 +7,7 @@ import styles from './page.module.scss';
 import BoardItem from '../../../features/board/board-item';
 import { ArrowLeftSquareIcon, PlusCircleIcon } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-import AsidePage from '@/features/aside/aside-page';
+import {AsidePage} from '@/features/aside/aside-page';
 import { useToast } from '@/hooks/use-toast';
 import { Board } from '@/types';
 

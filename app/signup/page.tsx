@@ -9,30 +9,29 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { toast } from '@/hooks/use-toast';
 //import { supabase } from '@/lib/supabase';
 import { createClient } from '@/lib/client';
 import { Eye } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
-//import axios from 'axios';
-
 
 function SignupPage() {
   const router = useRouter();
   const supabase = createClient();
 
   const [nameInput, setNameInput] = useState('');
-  const [emailInput, setEmailInput] = useState("");
-  const [passwordInput, setPasswordInput] = useState("");
+  const [emailInput, setEmailInput] = useState('');
+  const [passwordInput, setPasswordInput] = useState('');
 
   const saveUserEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmailInput(e.target.value);
-  }
+  };
 
   const saveUserPassword = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPasswordInput(e.target.value);
-  }
+  };
 
   //DB저장
   const handleSignup = async () => {
@@ -44,17 +43,25 @@ function SignupPage() {
 
       if (passwordInput.length < 6) {
         alert('비밀번호는 6자리 이상이여야합니다.');
-      } 
-      //email 중복확인 기능 추후 추가
-      else {
-        /*sessionStorage.setItem('user_email', emailInput);
-        sessionStorage.setItem('user_password', passwordInput);*/
-        router.push('/board');
       }
 
-      if (error) console.error(error);
+      if (error) {
+        toast({
+          variant: 'destructive',
+          title: '에러가 발생했습니다.',
+          description: `Supabase 오류: ${error.message || '알 수 없는 오류'}`,
+        });
+      } else {
+        /*const {} = await supabase.from('profiles').insert({
+          id: data.user?.id,
+          user_name: nameInput,
+          avatar_url: 'public/assets/profile.jpg',
+          email: emailInput,
+          
+        });*/
 
-
+        router.push('/board');
+      }
     } catch (error) {
       console.error('네트워크 오류: ' + error);
     }
@@ -85,11 +92,11 @@ function SignupPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-6" id="login-form">
-          <div className="grid gap-2">
+            <div className="grid gap-2">
               <label htmlFor="email">이름</label>
               <input
                 id="name"
-                type='id'
+                type="id"
                 placeholder="이름을 입력하세요."
                 onChange={(e) => setNameInput(e.target.value)}
                 required
@@ -141,9 +148,11 @@ function SignupPage() {
               >
                 이전
               </Button>
-              <Button className="w-full text-white bg-[#E79057] hover:bg-[#E26F24] hover:ring-1 hover:ring-[#E26F24] hover:ring-offset-1 active:bg-[#D5753D] hover:shadow-lg"
-              type='submit'
-              onClick={handleSignup}>
+              <Button
+                className="w-full text-white bg-[#E79057] hover:bg-[#E26F24] hover:ring-1 hover:ring-[#E26F24] hover:ring-offset-1 active:bg-[#D5753D] hover:shadow-lg"
+                type="submit"
+                onClick={handleSignup}
+              >
                 회원가입
               </Button>
             </div>
