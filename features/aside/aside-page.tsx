@@ -74,7 +74,7 @@ function AsidePage() {
       {/**TODO List */}
       <div className="flex flex-col mt-4 gap-2 mx-0">
         <small className="text-sm font-medium leading-none text-[#A6A6A6] mx-0">
-          민아의 TODO-BOARD
+          {`${user?.name}의 TODO-BOARD`}
         </small>
         <ul className="flex flex-col mt-2 bg-[#f5f5f5] rounded-sm text-sm">
           {todos.length > 0 ? (
