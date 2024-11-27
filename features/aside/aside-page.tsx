@@ -12,13 +12,6 @@ import { useAtomValue } from 'jotai';
 import { userAtom } from '@/stores/atom';
 
 function AsidePage() {
-  /*const fetchUserData = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if(user) return user.app_metadata;
-  };*/
-
   const user = useAtomValue(userAtom); //read
 
   const router = useRouter();
@@ -63,7 +56,7 @@ function AsidePage() {
 
   useEffect(() => {
     getTodos();
-  }, []);
+  }, [getTodos]);
 
   return (
     <aside className="page__aside">

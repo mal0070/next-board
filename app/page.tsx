@@ -45,7 +45,7 @@ function LoginPage() {
           email: user.email || '',
           avatar: '/assets/profile.jpg',
         };
-        
+
         document.cookie = `user=${JSON.stringify(
           userData
         )}; path=/; max-age=3600`; //한 시간 동안 유효
@@ -75,11 +75,11 @@ function LoginPage() {
     }
   };
 
-  useEffect(()=>{
+  /*useEffect(()=>{
     //로컬스토리지에 user데이터유무체크 후 리다이렉션
     const user = localStorage.getItem('user');
     if (user) redirect('/board');
-  },[]);
+  },[]);*/
 
   return (
     <div className="page">

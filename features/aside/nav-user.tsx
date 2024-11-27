@@ -25,16 +25,13 @@ import {
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/client';
 import { toast } from '@/hooks/use-toast';
-import { userAtom } from '@/stores/atom';
-import { useAtom } from 'jotai';
 
 interface Props {
-  user: User | undefined;
+  user: User | null;
 }
 export function NavUser({ user }: Props) {
   const router = useRouter();
   const supabase = createClient();
-  const [_, setUser] = useAtom(userAtom);
 
   const handleLogout = async () => {
     try {
