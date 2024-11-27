@@ -41,7 +41,8 @@ function LoginPage() {
 
         /*쿠키에 저장할 유저데이터 */
         const userData = {
-          name: user.id || 'mina',
+          id: user.id,
+          name: 'mina',
           email: user.email || '',
           avatar: '/assets/profile.jpg',
         };

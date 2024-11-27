@@ -2,12 +2,13 @@
 
 import { useToast } from "@/hooks/use-toast";
 import { supabase} from "@/lib/supabase";
-import { todosAtom } from "@/stores/atom";
-import { useAtom } from "jotai";
+import { todosAtom, userAtom } from "@/stores/atom";
+import { useAtom, useAtomValue } from "jotai";
 import { useRouter } from "next/navigation";
 
 export function useCreateTodo() {
   const router = useRouter();
+  const user = useAtomValue(userAtom);
   const [todos, setTodos] = useAtom(todosAtom);
   const {toast} = useToast();
 
@@ -16,6 +17,7 @@ export function useCreateTodo() {
       const { data, status, error } = await supabase
         .from('todos')
         .insert({
+          user_id: user?.id,
           title: null,
           from_date: null,
           to_date: null,

@@ -29,6 +29,7 @@ import { toast } from '@/hooks/use-toast';
 interface Props {
   user: User | null;
 }
+
 export function NavUser({ user }: Props) {
   const router = useRouter();
   const supabase = createClient();
@@ -39,12 +40,6 @@ export function NavUser({ user }: Props) {
 
       document.cookie ="user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       localStorage.clear();
-      
-      router.push('/');
-      toast({
-        title: '로그아웃을 완료하였습니다.',
-        description: 'TASK 관리 앱을 사용해주셔서 감사합니다.',
-      });
 
       router.push('/');
       toast({

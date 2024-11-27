@@ -1,15 +1,16 @@
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
-import { todosAtom } from '@/stores/atom';
-import { useAtom } from 'jotai';
+import { todosAtom, userAtom } from '@/stores/atom';
+import { useAtom, useAtomValue } from 'jotai';
 
 export function useGetTodos() {
   const { toast } = useToast();
   const [todos, setTodos] = useAtom(todosAtom);
+  const user = useAtomValue(userAtom);
 
   const getTodos = async () => {
     try {
-      const { data, status, error } = await supabase.from('todos').select();
+      const { data, status, error } = await supabase.from('todos').select().eq('user_id',user?.id);
 
       if (data && status === 200) setTodos(data);
 
