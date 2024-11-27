@@ -15,8 +15,8 @@ import { userAtom } from '@/stores/atom';
 import { useAtom } from 'jotai';
 import { Eye } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import { redirect, useRouter } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
 
 function LoginPage() {
   const supabase = createClient();
@@ -28,18 +28,30 @@ function LoginPage() {
 
   const signIn = async () => {
     try {
-      const { data:{user}, error } = await supabase.auth.signInWithPassword({
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.signInWithPassword({
         email: emailInput,
         password: passwordInput,
       });
 
       if (user) {
         console.log(user);
-        setUser({
+
+        /*쿠키에 저장할 유저데이터 */
+        const userData = {
           name: user.id || 'mina',
           email: user.email || '',
-          avatar: '/assets/profile.jpg', //public이면 최상단으로 접근함
-        });
+          avatar: '/assets/profile.jpg',
+        };
+        
+        document.cookie = `user=${JSON.stringify(
+          userData
+        )}; path=/; max-age=3600`; //한 시간 동안 유효
+
+        setUser(userData);
+
         toast({
           title: '로그인을 성공하였습니다.',
           description: '자유롭게 TASK 관리를 해주세요!',
@@ -63,7 +75,12 @@ function LoginPage() {
     }
   };
 
-  //supabase 로그인
+  useEffect(()=>{
+    //로컬스토리지에 user데이터유무체크 후 리다이렉션
+    const user = localStorage.getItem('user');
+    if (user) redirect('/board');
+  },[]);
+
   return (
     <div className="page">
       <div className="page__container">

@@ -25,6 +25,8 @@ import {
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/client';
 import { toast } from '@/hooks/use-toast';
+import { userAtom } from '@/stores/atom';
+import { useAtom } from 'jotai';
 
 interface Props {
   user: User | undefined;
@@ -32,22 +34,42 @@ interface Props {
 export function NavUser({ user }: Props) {
   const router = useRouter();
   const supabase = createClient();
-  
+  const [_, setUser] = useAtom(userAtom);
+
   const handleLogout = async () => {
-    const { error } = await supabase.auth.signOut();
-    router.push("/");
-    toast({
-        title: "로그아웃을 완료하였습니다.",
-        description: "TASK 관리 앱을 사용해주셔서 감사합니다.",
-    });
-    if (error) {
+    try {
+      const { error } = await supabase.auth.signOut();
+
+      document.cookie ="user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
+      router.push('/');
+      toast({
+        title: '로그아웃을 완료하였습니다.',
+        description: 'TASK 관리 앱을 사용해주셔서 감사합니다.',
+      });
+
+      router.push('/');
+      toast({
+        title: '로그아웃을 완료하였습니다.',
+        description: 'TASK 관리 앱을 사용해주셔서 감사합니다.',
+      });
+
+      if (error) {
         toast({
-            variant: "destructive",
-            title: "에러가 발생했습니다.",
-            description: `Supabase 오류: ${error.message || "알 수 없는 오류"}`,
+          variant: 'destructive',
+          title: '에러가 발생했습니다.',
+          description: `Supabase 오류: ${error.message || '알 수 없는 오류'}`,
         });
+      }
+    } catch (error) {
+      console.error(error);
+      toast({
+        variant: 'destructive',
+        title: '네트워크 오류',
+        description: '서버와 연결할 수 없습니다. 다시 시도해주세요!',
+      });
     }
-};
+  };
 
   return (
     <DropdownMenu>
