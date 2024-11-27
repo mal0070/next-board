@@ -38,7 +38,8 @@ export function NavUser({ user }: Props) {
       const { error } = await supabase.auth.signOut();
 
       document.cookie ="user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-
+      localStorage.clear();
+      
       router.push('/');
       toast({
         title: '로그아웃을 완료하였습니다.',
