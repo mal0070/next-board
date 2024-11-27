@@ -1,14 +1,7 @@
 'use client';
 
 import { User } from '@/types';
-import {
-  BadgeCheck,
-  Bell,
-  ChevronsUpDown,
-  CreditCard,
-  LogOut,
-  Sparkles,
-} from 'lucide-react';
+import { BadgeCheck, ChevronsUpDown, LogOut } from 'lucide-react';
 import {
   Avatar,
   AvatarFallback,
@@ -16,7 +9,6 @@ import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -25,6 +17,9 @@ import {
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/client';
 import { toast } from '@/hooks/use-toast';
+import Modal from 'react-modal';
+import { useState } from 'react';
+import { ProfileCard } from './profile-card';
 
 interface Props {
   user: User | null;
@@ -33,12 +28,14 @@ interface Props {
 export function NavUser({ user }: Props) {
   const router = useRouter();
   const supabase = createClient();
+  const [isProfileCardOpen, setIsProfileCardOpen] = useState(false);
+
 
   const handleLogout = async () => {
     try {
       const { error } = await supabase.auth.signOut();
 
-      document.cookie ="user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      document.cookie = 'user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
       localStorage.clear();
 
       router.push('/');
@@ -64,32 +61,16 @@ export function NavUser({ user }: Props) {
     }
   };
 
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant={'outline'}
-          className="py-6 px-3 flex items-center justify-evenly"
-        >
-          <Avatar className="h-8 w-8 rounded-lg">
-            <AvatarImage src={user?.avatar} alt={user?.name} />
-            <AvatarFallback className="rounded-lg">CN</AvatarFallback>
-          </Avatar>
-          <div className="grid flex-1 text-left text-sm leading-tight">
-            <span className="truncate font-semibold">{user?.name}</span>
-            <span className="truncate text-xs">{user?.email}</span>
-          </div>
-          <ChevronsUpDown className="ml-auto size-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent
-        className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
-        side="right"
-        align="end"
-        sideOffset={4}
-      >
-        <DropdownMenuLabel className="p-0 font-normal">
-          <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+  if (isProfileCardOpen) {
+    return <ProfileCard onClose={()=> setIsProfileCardOpen(false)}/>;
+  } else {
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant={'outline'}
+            className="py-6 px-3 flex items-center justify-evenly"
+          >
             <Avatar className="h-8 w-8 rounded-lg">
               <AvatarImage src={user?.avatar} alt={user?.name} />
               <AvatarFallback className="rounded-lg">CN</AvatarFallback>
@@ -98,36 +79,39 @@ export function NavUser({ user }: Props) {
               <span className="truncate font-semibold">{user?.name}</span>
               <span className="truncate text-xs">{user?.email}</span>
             </div>
-          </div>
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <Sparkles />
-            Upgrade to Pro
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem>
+            <ChevronsUpDown className="ml-auto size-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+          side="right"
+          align="end"
+          sideOffset={4}
+        >
+          <DropdownMenuLabel className="p-0 font-normal">
+            <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+              <Avatar className="h-8 w-8 rounded-lg">
+                <AvatarImage src={user?.avatar} alt={user?.name} />
+                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+              </Avatar>
+              <div className="grid flex-1 text-left text-sm leading-tight">
+                <span className="truncate font-semibold">{user?.name}</span>
+                <span className="truncate text-xs">{user?.email}</span>
+              </div>
+            </div>
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onSelect={()=>setIsProfileCardOpen(true)}>
             <BadgeCheck />
             Account
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <CreditCard />
-            Billing
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={handleLogout}>
+            <LogOut />
+            Log out
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Bell />
-            Notifications
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleLogout}>
-          <LogOut />
-          Log out
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  }
 }
