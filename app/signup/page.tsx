@@ -12,6 +12,8 @@ import {
 import { toast } from '@/hooks/use-toast';
 //import { supabase } from '@/lib/supabase';
 import { createClient } from '@/lib/client';
+import { userAtom } from '@/stores/atom';
+import { useAtom } from 'jotai';
 import { Eye } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -36,14 +38,17 @@ function SignupPage() {
   //DB저장
   const handleSignup = async () => {
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email: emailInput,
-        password: passwordInput,
-      });
-
       if (passwordInput.length < 6) {
         alert('비밀번호는 6자리 이상이여야합니다.');
       }
+
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.signUp({
+        email: emailInput,
+        password: passwordInput,
+      });
 
       if (error) {
         toast({
@@ -51,19 +56,36 @@ function SignupPage() {
           title: '에러가 발생했습니다.',
           description: `Supabase 오류: ${error.message || '알 수 없는 오류'}`,
         });
-      } else {
-        /*const {} = await supabase.from('profiles').insert({
-          id: data.user?.id,
-          user_name: nameInput,
-          avatar_url: 'public/assets/profile.jpg',
-          email: emailInput,
-          
-        });*/
+      }
 
-        router.push('/board');
+      if (user) {
+        //user가 생성되면
+        //profile db에 추가
+        const { data, error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            id: user?.id,
+            user_name: nameInput,
+            avatar_url: '/assets/profile.jpg',
+            email: emailInput,
+          })
+          .select();
+        
+        if (profileError) throw profileError;
+
+        toast({
+          title: '회원가입 성공',
+          description: '프로필이 생성되었습니다.',
+        });
+
+        router.push('/');
       }
     } catch (error) {
-      console.error('네트워크 오류: ' + error);
+      toast({
+        variant: 'destructive',
+        title: '에러가 발생했습니다.',
+        description: '네트워크 오류',
+      });
     }
   };
 

@@ -24,8 +24,6 @@ function BoardPage() {
   const [progress, setProgress] = React.useState<number>(0);
 
   React.useEffect(() => {
-    /*const user = localStorage.getItem('user');
-    if(!user) router.push('/'); -> server side*/
     getTodoTitleAndDate();
   }, [tid]);
 

@@ -39,25 +39,30 @@ function LoginPage() {
       if (user) {
         console.log(user);
 
-        /*쿠키에 저장할 유저데이터 */
-        const userData = {
-          id: user.id,
-          name: 'mina',
-          email: user.email || '',
-          avatar: '/assets/profile.jpg',
-        };
+        /*쿠키에 저장할 유저데이터:profiles에서 찾음 */
+        const { data: profileData, error: profileError} = await supabase.from('profiles').select().eq('id',user.id).single();
+        
+        if(profileData){
+          console.log(profileData);
+          const userData = {
+            id: user.id,
+            name: profileData.user_name,
+            email: profileData.email,
+            avatar: profileData.avatar_url,
+          };
 
-        document.cookie = `user=${JSON.stringify(
-          userData
-        )}; path=/; max-age=3600`; //한 시간 동안 유효
+          document.cookie = `user=${JSON.stringify(
+            userData
+          )}; path=/; max-age=3600`; //한 시간 동안 유효
+  
+          setUser(userData);
 
-        setUser(userData);
-
-        toast({
-          title: '로그인을 성공하였습니다.',
-          description: '자유롭게 TASK 관리를 해주세요!',
-        });
-        router.push('/board'); // 로그인 페이지로 이동
+          toast({
+            title: '로그인을 성공하였습니다.',
+            description: '자유롭게 TASK 관리를 해주세요!',
+          });
+          router.push('/board'); // 로그인 페이지로 이동
+        }
       }
 
       if (error) {
