@@ -25,6 +25,7 @@ function BoardPage() {
 
   React.useEffect(() => {
     getTodoTitleAndDate();
+    getBoards();
   }, [tid]);
 
   async function deleteTodo() {

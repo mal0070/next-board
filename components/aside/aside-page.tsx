@@ -6,10 +6,11 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useCreateTodo, useGetTodos } from '@/hooks/api/supabase';
 import { supabase } from '@/lib/supabase';
-import { useToast } from '@/hooks/use-toast';
+import { toast} from '@/hooks/use-toast';
 import { NavUser } from './nav-user';
 import { useAtomValue } from 'jotai';
 import { userAtom } from '@/stores/atom';
+import { get } from 'http';
 
 function AsidePage() {
   const user = useAtomValue(userAtom); //read
@@ -17,8 +18,8 @@ function AsidePage() {
   const router = useRouter();
   const createPage = useCreateTodo();
 
-  const { todos, setTodos, getTodos } = useGetTodos();
-  const { toast } = useToast();
+  const { todos,setTodos, getTodos } = useGetTodos();
+
   const [searchTerm, setSearchTerm] = useState<string>('');
 
   const handleSearch = async (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -27,13 +28,22 @@ function AsidePage() {
         const { data, status, error } = await supabase
           .from('todos')
           .select('*')
+          .eq('user_id', user?.id)
           .ilike('title', `%${searchTerm}%`);
+          
+        console.log(data);
 
-        if (data && status === 200) {
+        if (data && data.length>0 && status === 200) {
           setTodos(data);
           toast({
             title: '검색.',
             description: '해당 검색어가 포함된 TODO를 호출했습니다.',
+          });
+        } else {
+          setTodos([]);
+          toast({
+            title: '데이터 없음',
+            description: '해당 검색어가 포함된 TODO가 없습니다.',
           });
         }
 
@@ -56,7 +66,9 @@ function AsidePage() {
 
   useEffect(() => {
     getTodos();
-  }, [getTodos]);
+  }, [getTodos]); 
+  /* getTodo넣으면 검색X
+  setTodo, Todo 넣으면 검색O 새로고침하면 Todo 안나타남*/
 
   return (
     <aside className="page__aside">
