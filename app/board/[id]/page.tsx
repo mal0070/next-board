@@ -4,7 +4,7 @@ import * as React from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { Button, Progress, DatePicker } from '@/components/ui';
 import styles from './page.module.scss';
-import BoardItem from '../../../features/board/board-item';
+import BoardItem from '../../../components/board/board-item';
 import { ArrowLeftSquareIcon, PlusCircleIcon } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';

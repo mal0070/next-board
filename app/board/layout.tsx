@@ -1,5 +1,5 @@
 /** UI 컴포넌트 */
-import { AsidePage } from "@/features/aside/aside-page"
+import { AsidePage } from "@/components/aside/aside-page"
 
 export default function RootLayout({
     children,

@@ -9,10 +9,9 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtom} from 'jotai';
 import { userAtom } from '@/stores/atom';
 import { supabase } from '@/lib/supabase';
-import { RESET } from 'jotai/utils';
 import { User } from '@/types';
 
 interface Props {
