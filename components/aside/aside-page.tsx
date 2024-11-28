@@ -89,11 +89,14 @@ function AsidePage() {
               </li>
             ))
           ) : (
-            <li className="py-2 px-[10px]">Enter Title</li>
+            <li className="py-2 px-[10px] flex items-center gap-2">
+              <div className="h-[10px] w-[10px] bg-[#979897]"></div>
+              <p className='text-[#979897]'>등록한 TODO가 없습니다.</p>
+            </li>
           )}
         </ul>
       </div>
-      <NavUser user={user}/>
+      <NavUser user={user} />
     </aside>
   );
 }

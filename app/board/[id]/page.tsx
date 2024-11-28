@@ -111,41 +111,41 @@ function BoardPage() {
     }
   };
 
-  const handleBoardChange = React.useCallback(async (changedBoardData: Board) => {
-    setBoards((prevItems) =>
-      prevItems.map((item) =>
-        item.id === changedBoardData.id ? changedBoardData : item
-      )
-    );
+  const handleBoardChange = React.useCallback(
+    async (changedBoardData: Board) => {
+      setBoards((prevItems) =>
+        prevItems.map((item) =>
+          item.id === changedBoardData.id ? changedBoardData : item
+        )
+      );
 
-    try {
-      const { error } = await supabase
-        .from('boards')
-        .update(changedBoardData)
-        .eq('id', changedBoardData.id);
+      try {
+        const { error } = await supabase
+          .from('boards')
+          .update(changedBoardData)
+          .eq('id', changedBoardData.id);
 
-      if (error) {
+        if (error) {
+          toast({
+            variant: 'destructive',
+            title: '에러가 발생했습니다.',
+            description: `Supabase 오류: ${error.message || '알 수 없는 오류'}`,
+          });
+        }
+      } catch (error) {
         toast({
           variant: 'destructive',
-          title: '에러가 발생했습니다.',
-          description: `Supabase 오류: ${error.message || '알 수 없는 오류'}`,
+          title: '네트워크 오류',
+          description: '서버와 연결할 수 없습니다. 다시 시도해주세요.',
         });
       }
-    } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: '네트워크 오류',
-        description: '서버와 연결할 수 없습니다. 다시 시도해주세요.',
-      });
-    }
-  }, []);
-
+    },
+    []
+  );
 
   const updateBoardChange = async () => {
-    const { error } = await supabase
-    .from('boards')
-    .upsert(boards);
-  } //데이터베이스에 모든 보드의 항목을 업데이트
+    const { error } = await supabase.from('boards').upsert(boards);
+  }; //데이터베이스에 모든 보드의 항목을 업데이트
 
   const handleDelete = (id: number) => {
     //UI업데이트
@@ -231,92 +231,88 @@ function BoardPage() {
   };
 
   return (
-    <div className="page">
-      <main className="page__main">
-        <div className={styles.header}>
-          <div className={styles.header__top}>
-            <div className="flex justify-between">
-              <ArrowLeftSquareIcon className="w-10 h-10" onClick={backHome} />
-              <div className="flex gap-2">
-                <Button className="w-14 h-10 " onClick={saveChange}>
-                  저장
-                </Button>
-                <Button
-                  className="w-14 h-10 bg-red-400 text-red-800"
-                  onClick={deleteTodo}
-                >
-                  삭제
-                </Button>
-              </div>
-            </div>
-            <input
-              type="text"
-              placeholder="Enter title here!"
-              className={styles.header__top__input}
-              value={todoTitle}
-              onChange={handleTodoTitleChange}
-            ></input>
-            <div className="flex boards-center justify-start gap-4">
-              <small className="text-sm font-medium leading-none text-[#A6A6A6] mx-0">
-                {progress}/{boards.length} Completed
-              </small>
-              <Progress
-                className="w-60 h-[10px]"
-                value={progress}
-                max={boards.length}
-              ></Progress>
-            </div>
-          </div>
-          <div className={styles.header__bottom}>
-            <div className="flex boards-center gap-3">
-              <DatePicker
-                label="From"
-                isReadOnly={false}
-                value={todoStartDate}
-                onSetDate={(date) => setTodoStartDate(date)}
-              />
-              <DatePicker
-                label="To"
-                isReadOnly={false}
-                value={todoEndDate}
-                onSetDate={(date) => setTodoEndDate(date)}
-              />
-              <Button className="bg-gray-200 text-gray-500">
-                View Timeline
+    <>
+      <div className={styles.header}>
+        <div className={styles.header__top}>
+          <div className="flex justify-between">
+            <ArrowLeftSquareIcon className="w-10 h-10" onClick={backHome} />
+            <div className="flex gap-2">
+              <Button className="w-14 h-10 " onClick={saveChange}>
+                저장
+              </Button>
+              <Button
+                className="w-14 h-10 bg-red-400 text-red-800"
+                onClick={deleteTodo}
+              >
+                삭제
               </Button>
             </div>
-            <Button
-              className="bg-[#ea8628] border border-[#E79057] hover:bg-[#ffb235]"
-              onClick={createBoard}
-            >
-              Add New Board
-            </Button>
+          </div>
+          <input
+            type="text"
+            placeholder="Enter title here!"
+            className={styles.header__top__input}
+            value={todoTitle}
+            onChange={handleTodoTitleChange}
+          ></input>
+          <div className="flex boards-center justify-start gap-4">
+            <small className="text-sm font-medium leading-none text-[#A6A6A6] mx-0">
+              {progress}/{boards.length} Completed
+            </small>
+            <Progress
+              className="w-60 h-[10px]"
+              value={progress}
+              max={boards.length}
+            ></Progress>
           </div>
         </div>
-        <div className={styles.area}>
-          {boards.length > 0 ? (
-            boards.map((board) => (
-              <BoardItem
-                key={board.id}
-                data={board}
-                onDelete={handleDelete}
-               onChange={handleBoardChange}
-              />
-            ))
-          ) : (
-            <div className="flex flex-col boards-center gap-4">
-              <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
-                There is no board yet.
-              </h3>
-              <PlusCircleIcon
-                className="w-14 h-14"
-                onClick={createBoard}
-              ></PlusCircleIcon>
-            </div>
-          )}
+        <div className={styles.header__bottom}>
+          <div className="flex boards-center gap-3">
+            <DatePicker
+              label="From"
+              isReadOnly={false}
+              value={todoStartDate}
+              onSetDate={(date) => setTodoStartDate(date)}
+            />
+            <DatePicker
+              label="To"
+              isReadOnly={false}
+              value={todoEndDate}
+              onSetDate={(date) => setTodoEndDate(date)}
+            />
+            <Button className="bg-gray-200 text-gray-500">View Timeline</Button>
+          </div>
+          <Button
+            className="bg-[#ea8628] border border-[#E79057] hover:bg-[#ffb235]"
+            onClick={createBoard}
+          >
+            Add New Board
+          </Button>
         </div>
-      </main>
-    </div>
+      </div>
+      <div className={styles.area}>
+        {boards.length > 0 ? (
+          boards.map((board) => (
+            <BoardItem
+              key={board.id}
+              data={board}
+              onDelete={handleDelete}
+              onChange={handleBoardChange}
+            />
+          ))
+        ) : (
+          <div className="flex flex-col gap-4 self-center mt-20">
+            <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
+              There is no board yet.
+            </h3>
+            <PlusCircleIcon
+              className="w-14 h-14 self-center"
+              onClick={createBoard}
+            ></PlusCircleIcon>
+          </div>
+        )}
+      </div>
+    </>
   );
 }
 
