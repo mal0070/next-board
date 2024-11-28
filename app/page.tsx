@@ -22,7 +22,7 @@ function LoginPage() {
   const supabase = createClient();
   const router = useRouter();
 
-  const [user, setUser] = useAtom(userAtom);
+  const [_, setUser] = useAtom(userAtom);
   const [emailInput, setEmailInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
 
@@ -37,13 +37,13 @@ function LoginPage() {
       });
 
       if (user) {
-        console.log(user);
+        //console.log(user);
 
         /*쿠키에 저장할 유저데이터:profiles에서 찾음 */
         const { data: profileData, error: profileError} = await supabase.from('profiles').select().eq('id',user.id).single();
         
         if(profileData){
-          console.log(profileData);
+          //console.log(profileData);
           const userData = {
             id: user.id,
             name: profileData.user_name,
