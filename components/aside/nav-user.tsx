@@ -17,7 +17,6 @@ import {
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/client';
 import { toast } from '@/hooks/use-toast';
-import Modal from 'react-modal';
 import { useState } from 'react';
 import { ProfileCard } from './profile-card';
 

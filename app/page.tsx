@@ -15,8 +15,8 @@ import { userAtom } from '@/stores/atom';
 import { useAtom } from 'jotai';
 import { Eye } from 'lucide-react';
 import Link from 'next/link';
-import { redirect, useRouter } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import React, { useState } from 'react';
 
 function LoginPage() {
   const supabase = createClient();

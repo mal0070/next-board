@@ -12,8 +12,6 @@ import {
 import { toast } from '@/hooks/use-toast';
 //import { supabase } from '@/lib/supabase';
 import { createClient } from '@/lib/client';
-import { userAtom } from '@/stores/atom';
-import { useAtom } from 'jotai';
 import { Eye } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';

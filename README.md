@@ -25,7 +25,7 @@ Figma : https://www.figma.com/design/Mh9mCgqPSFRYp3px8b2SUH/%EC%8A%A4%EB%82%98%E
   - `npx shadcn@latest add card`
   - `npx shadcn@latest add date-picker`
   - `npx shadcn@latest add dialog`
- - `npx shadcn@latest add dropdown-menu`
+  - `npx shadcn@latest add dropdown-menu`
   - `npx shadcn@latest add input`
   - `npx shadcn@latest add popover`
   - `npx shadcn@latest add progress`

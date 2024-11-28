@@ -1,6 +1,5 @@
 'use client';
 
-import {AsidePage} from "@/components/aside/aside-page";
 import { Button } from '@/components/ui';
 import { useCreateTodo } from "@/hooks/api/supabase";
 
