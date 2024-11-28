@@ -1,5 +1,8 @@
 ## Next.js와 Supabase를 이용한 TO-DO List 개발
 
+배포 URL : https://next-board-f304ppf9i-minas-projects-1f523a49.vercel.app/
+
+
 ### 프로젝트 설명
 
 1. Shadcn UI 공식문서의 CLI를 통해 NEXT.js 프로젝트를 생성합니다. 하기에 작성한 명령어를 통해 설치해줍니다. 또한, 모든 기본 설정을 통해 진행하였습니다.
