@@ -10,7 +10,6 @@ import { toast} from '@/hooks/use-toast';
 import { NavUser } from './nav-user';
 import { useAtomValue } from 'jotai';
 import { userAtom } from '@/stores/atom';
-import { get } from 'http';
 
 function AsidePage() {
   const user = useAtomValue(userAtom); //read

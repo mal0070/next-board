@@ -59,7 +59,7 @@ function LoginPage() {
 
           toast({
             title: '로그인을 성공하였습니다.',
-            description: '자유롭게 TASK 관리를 해주세요!',
+            description: '자유롭게 To-Do 관리를 해주세요!',
           });
           router.push('/board'); // 로그인 페이지로 이동
         }
@@ -95,7 +95,7 @@ function LoginPage() {
           <div className="flex flex-col items-center justify-center mt-2 mb-4">
             <div className="text-sm text-muted-foreground">
               <small className="text-sm text-[#e79057] font-medium leading-none">
-                Task 관리 앱
+                To-Do 관리 앱
               </small>
               에 방문해주셔서 감사합니다.
             </div>
